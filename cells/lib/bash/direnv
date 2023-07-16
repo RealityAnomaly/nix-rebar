@@ -25,18 +25,28 @@ if [ -e ".nix-overrides" ]; then
 fi
 
 alias_dir="$PWD/.direnv/aliases"
+rm -rf "$alias_dir"
 mkdir -p "$alias_dir"
 if ! [[ ":$PATH:" == *":$alias_dir:"* ]]; then
   PATH_add "$alias_dir"
 fi
-cat << 'EOF' > "$PWD/.direnv/aliases/nix-override"
-#!/usr/bin/env bash
-IFS=' ' read -r -a param_overrides <<< "$NIX_PARAM_OVERRIDES"
-nix_invocation_params=("nix" "$@" "${param_overrides[@]}")
 
-"${nix_invocation_params[@]}"
+function create_nix_wrapper() {
+	local wrapper_name="$2"
+	cat << EOF > "$PWD/.direnv/aliases/$wrapper_name"
+#!/usr/bin/env bash
+IFS=' ' read -r -a param_overrides <<< "\$NIX_PARAM_OVERRIDES"
+nix_invocation_params=("$1" "\$@" "\${param_overrides[@]}")
+
+"\${nix_invocation_params[@]}"
 EOF
-chmod +x "$PWD/.direnv/aliases/nix-override"
+
+	chmod +x "$PWD/.direnv/aliases/$wrapper_name"
+}
+
+create_nix_wrapper nix nix-override
+create_nix_wrapper nixos-rebuild nixos-rebuild-override
+create_nix_wrapper darwin-rebuild darwin-rebuild-override
 
 { # PRJ Base Directory Specification: https://github.com/numtide/prj-spec
 	# shellcheck source=/dev/null

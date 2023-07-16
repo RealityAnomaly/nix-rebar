@@ -9,6 +9,7 @@ in {
     # default profiles for this profile
     root.core.nix.default
     root.core.secrets.default
+    root.core.security.default
   ];
 
   environment.variables = rec {

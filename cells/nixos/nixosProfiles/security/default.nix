@@ -4,7 +4,6 @@
     root.security.certs.default
     root.security.elevation.default
     root.security.hardening.default
-    root.security.ssh.default
   ];
 
   users = {
