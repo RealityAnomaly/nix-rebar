@@ -1,6 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
-{
+{ self, config, lib, pkgs, ... }: {
   options.rebar.host = {
     wsl = lib.mkOption {
       type = lib.types.bool;

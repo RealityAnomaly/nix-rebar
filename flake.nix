@@ -3,9 +3,19 @@
 
   inputs = {
     # intrinsic::channels
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.follows = "nixpkgs-stable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # intrinsic::libraries
+    arion = {
+      url = "github:hercules-ci/arion";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    devshell = {
+      url = "github:numtide/devshell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     haumea = {
       url = "github:nix-community/haumea";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,16 +29,52 @@
         home.follows = "home";
         home-manager.url = "github:divnix/blank";
         nixos-generators.follows = "nixos-generators";
+        paisano.follows = "paisano";
       };
     };
     home = {
       url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    makes = {
+      url = "github:fluidattacks/makes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    microvm = {
+      url = "github:astro/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    namaka = {
+      url = "github:nix-community/namaka/v0.2.0";
+      inputs = {
+        haumea.follows = "haumea";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     nixago.url = "github:nix-community/nixago";
+    n2c = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    paisano = {
+      url = "github:divnix/paisano";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     std = {
       url = "github:divnix/std";
-      inputs.nixago.follows = "nixago";
+      inputs = {
+        arion.follows = "arion";
+        devshell.follows = "devshell";
+        makes.follows = "makes";
+        microvm.follows = "microvm";
+        nixago.follows = "nixago";
+        n2c.follows = "n2c";
+        terranix.follows = "terranix";
+      };
+    };
+    terranix = {
+      url = "github:terranix/terranix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # intrinsic::packages
@@ -52,20 +98,18 @@
 
       nixpkgsConfig = { allowUnfree = true; };
 
-      systems = [
-        "aarch64-darwin"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "x86_64-linux"
-      ];
+      systems =
+        [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ];
 
       cellsFrom = ./cells;
-      cellBlocks = with std.blockTypes; 
+      cellBlocks = with std.blockTypes;
         with hive.blockTypes; [
           # Library functions
           #(data "data")
-          #(devshells "devshells")
+          (devshells "devshells")
           #(installables "packages")
+          (namaka "snapshots")
+          (nixago "config")
           #(pkgs "overrides")
           #(files "files")
           (functions "functions")
@@ -87,9 +131,15 @@
           # Configurations
           diskoConfigurations
         ];
-    }
-    {
+    } {
+      # harvest :: system.cell.block.target -> system.target
+      # pick :: system.cell.block.target -> target (no system is necessary)
+      # winnow :: system.cell.block.target -> system.target (filtered version of harvest)
+
       #packages = std.harvest inputs.self [ "common" "packages" ];
+      checks =
+        std.harvest inputs.self [ "tests" "snapshots" "default" "check" ];
+      devShells = hive.harvest inputs.self [ "_repository" "devshells" ];
       functions = std.pick inputs.self [ "lib" "functions" ];
 
       commonModules = std.pick inputs.self [ "common" "commonModules" ];
@@ -101,7 +151,8 @@
       nixosProfiles = std.harvest inputs.self [ "nixos" "nixosProfiles" ];
       darwinProfiles = std.harvest inputs.self [ "darwin" "darwinProfiles" ];
       #homeProfiles = std.harvest inputs.self [ "home" "homeProfiles" ];
-      devshellProfiles = std.harvest inputs.self [ "common" "devshellProfiles" ];
+      devshellProfiles =
+        std.harvest inputs.self [ "common" "devshellProfiles" ];
 
       diskoConfigurations = hive.collect self "diskoConfigurations";
     };

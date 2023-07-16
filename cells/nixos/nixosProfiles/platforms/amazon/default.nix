@@ -1,10 +1,7 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }:
-{
-  imports = [
-    "${modulesPath}/virtualisation/amazon-image.nix"
-    root.mixins.cloud-init
-  ];
+{ self, config, lib, pkgs, modulesPath, ... }: {
+  imports =
+    [ "${modulesPath}/virtualisation/amazon-image.nix" root.mixins.cloud-init ];
 
   config = {
     # Don't invoke nixos-rebuild on boot

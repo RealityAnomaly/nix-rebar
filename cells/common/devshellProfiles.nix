@@ -23,7 +23,6 @@ let
     (maintenance nixpkgs.nixfmt)
     (maintenance nixpkgs.nodePackages.prettier)
     (maintenance nixpkgs.statix)
-    (maintenance nixpkgs.treefmt)
   ];
 
   linuxCommands = l.optionals isLinux [
@@ -45,6 +44,6 @@ in {
       }
     ];
 
-    packages = with nixpkgs; [ cachix editorconfig-checker shellcheck ];
+    packages = with nixpkgs; [ cachix shellcheck ];
   };
 }

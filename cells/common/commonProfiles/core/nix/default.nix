@@ -1,15 +1,12 @@
 { root, inputs, cell, ... }: # scope::cell
 { self, config, lib, pkgs, ... }: # scope::eval-config
-let
-  inherit (pkgs.stdenv.hostPlatform) isDarwin;
+let inherit (pkgs.stdenv.hostPlatform) isDarwin;
 in {
-  imports = [
-    root.core.nix.substituters.default
-  ];
+  imports = [ root.core.nix.substituters.default ];
 
   nix = {
     package = pkgs.nix;
-    
+
     settings = {
       # Avoid copying unnecessary stuff over SSH
       builders-use-substitutes = true;

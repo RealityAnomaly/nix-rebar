@@ -1,6 +1,6 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: let
-  inherit (inputs) cells;
+{ self, config, lib, pkgs, ... }:
+let inherit (inputs) cells;
 in {
   imports = [
     # import the base profile for all platforms

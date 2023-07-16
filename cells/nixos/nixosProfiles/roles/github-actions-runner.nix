@@ -3,16 +3,13 @@
 let
   cfg = config.rebar.roles.github-actions-runner;
   queued-build-hook = builtins.fetchTarball {
-    url = "https://github.com/nix-community/queued-build-hook/archive/dcbc8cdf915370abb789b108088d42e241008c2f.tar.gz";
+    url =
+      "https://github.com/nix-community/queued-build-hook/archive/dcbc8cdf915370abb789b108088d42e241008c2f.tar.gz";
     sha256 = "0y02741kpk57h54jnm8y6qa60fr0wklajy13sk4r02hq7m4vz6rr";
   };
-in
-{
+in {
 
-  imports = [
-    ../modules/github-runners
-    "${queued-build-hook}/module.nix"
-  ];
+  imports = [ ../modules/github-runners "${queued-build-hook}/module.nix" ];
 
   options.rebar.roles.github-actions-runner = {
     url = lib.mkOption {
@@ -44,7 +41,6 @@ in
       default = true;
     };
 
-
     githubApp = lib.mkOption {
       default = null;
       description = lib.mdDoc ''
@@ -58,7 +54,8 @@ in
           };
           login = lib.mkOption {
             type = lib.types.str;
-            description = lib.mdDoc "GitHub login used to register the application";
+            description =
+              lib.mdDoc "GitHub login used to register the application";
           };
           privateKeyFile = lib.mkOption {
             type = lib.types.path;
@@ -110,7 +107,8 @@ in
 
     binary-cache = {
       script = lib.mkOption {
-        description = lib.mdDoc "Script used by asynchronous process to upload Nix packages to the binary cache, without requiring the use of Cachix.";
+        description = lib.mdDoc
+          "Script used by asynchronous process to upload Nix packages to the binary cache, without requiring the use of Cachix.";
         type = lib.types.nullOr lib.types.str;
         default = null;
       };
@@ -154,41 +152,38 @@ in
       default = [ "nix" ];
     };
 
-
   };
 
   config = {
     users.groups.github-runner = lib.mkIf (cfg.extraReadWritePaths != [ ]) { };
-    services.srvos-github-runners = builtins.listToAttrs (map
-      (n: rec {
-        name = "${cfg.name}-${toString n}";
-        value = {
-          inherit name;
-          user = name;
-          enable = true;
-          url = cfg.url;
-          tokenFile = cfg.tokenFile;
-          githubApp = cfg.githubApp;
-          ephemeral = cfg.ephemeral;
-          serviceOverrides = {
-            DeviceAllow = [ "/dev/kvm" ];
-            PrivateDevices = false;
-          } // (lib.optionalAttrs (cfg.extraReadWritePaths != [ ]) {
-            ReadWritePaths = cfg.extraReadWritePaths;
-            Group = [ "github-runner" ];
-          });
-          extraPackages = [
-            pkgs.cachix
-            pkgs.glibc.bin
-            pkgs.jq
-            config.nix.package
-            pkgs.nix-eval-jobs
-            pkgs.openssh
-          ] ++ cfg.extraPackages;
-          extraLabels = cfg.extraLabels;
-        };
-      })
-      (lib.range 1 cfg.count));
+    services.srvos-github-runners = builtins.listToAttrs (map (n: rec {
+      name = "${cfg.name}-${toString n}";
+      value = {
+        inherit name;
+        user = name;
+        enable = true;
+        inherit (cfg) url;
+        inherit (cfg) tokenFile;
+        inherit (cfg) githubApp;
+        inherit (cfg) ephemeral;
+        serviceOverrides = {
+          DeviceAllow = [ "/dev/kvm" ];
+          PrivateDevices = false;
+        } // (lib.optionalAttrs (cfg.extraReadWritePaths != [ ]) {
+          ReadWritePaths = cfg.extraReadWritePaths;
+          Group = [ "github-runner" ];
+        });
+        extraPackages = [
+          pkgs.cachix
+          pkgs.glibc.bin
+          pkgs.jq
+          config.nix.package
+          pkgs.nix-eval-jobs
+          pkgs.openssh
+        ] ++ cfg.extraPackages;
+        inherit (cfg) extraLabels;
+      };
+    }) (lib.range 1 cfg.count));
 
     # Required to run unmodified binaries fetched via dotnet in a dev environment.
     programs.nix-ld.enable = true;
@@ -196,18 +191,17 @@ in
     # Automatically sync all the locally built artifacts to cachix.
     services.cachix-watch-store = lib.mkIf (cfg.cachix.cacheName != null) {
       enable = true;
-      cacheName = cfg.cachix.cacheName;
+      inherit (cfg.cachix) cacheName;
       cachixTokenFile = cfg.cachix.tokenFile;
       jobs = 4;
     };
 
-    queued-build-hook = lib.mkIf (cfg.binary-cache.script != null)
-      ({
-        enable = true;
-        postBuildScriptContent = cfg.binary-cache.script;
-        credentials = cfg.binary-cache.credentials;
-      } // (lib.optionalAttrs (cfg.binary-cache.enqueueScript != "") {
-        enqueueScriptContent = cfg.binary-cache.enqueueScript;
-      }));
+    queued-build-hook = lib.mkIf (cfg.binary-cache.script != null) ({
+      enable = true;
+      postBuildScriptContent = cfg.binary-cache.script;
+      inherit (cfg.binary-cache) credentials;
+    } // (lib.optionalAttrs (cfg.binary-cache.enqueueScript != "") {
+      enqueueScriptContent = cfg.binary-cache.enqueueScript;
+    }));
   };
 }

@@ -1,8 +1,8 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
-{
+{ self, config, lib, pkgs, ... }: {
   programs.bcc.enable = !pkgs.stdenv.hostPlatform.isRiscV;
-  programs.sysdig.enable = !pkgs.stdenv.isAarch64 && !pkgs.stdenv.hostPlatform.isRiscV;
+  programs.sysdig.enable = !pkgs.stdenv.isAarch64
+    && !pkgs.stdenv.hostPlatform.isRiscV;
 
   environment.systemPackages = [
     pkgs.strace

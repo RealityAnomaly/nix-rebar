@@ -18,12 +18,9 @@
     # - systems that require networking in early-boot
     # - systems with raids as this currently require manual configuration (https://github.com/NixOS/nixpkgs/issues/210210)
     # - for containers we currently rely on the `stage-2` init script that sets up our /etc
-    initrd.systemd.enable = lib.mkDefault (
-      !config.boot.initrd.network.enable &&
-      !config.boot.initrd.services.swraid.enable &&
-      !config.boot.isContainer &&
-      !config.boot.growPartition
-    );
+    initrd.systemd.enable = lib.mkDefault (!config.boot.initrd.network.enable
+      && !config.boot.initrd.services.swraid.enable && !config.boot.isContainer
+      && !config.boot.growPartition);
 
     # Ensure a clean & sparkling /tmp on fresh boots.
     tmp.cleanOnBoot = lib.mkDefault true;

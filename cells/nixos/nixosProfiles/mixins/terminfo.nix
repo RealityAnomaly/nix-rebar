@@ -1,6 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
-{
+{ self, config, lib, pkgs, ... }: {
   # various terminfo packages
   environment.systemPackages = [
     pkgs.wezterm.terminfo # this one does not need compilation

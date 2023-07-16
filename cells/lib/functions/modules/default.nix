@@ -1,6 +1,6 @@
 { root, inputs, cell, }:
 let
-  inherit (inputs) cells haumea nixpkgs;
+  inherit (inputs) haumea nixpkgs;
   inherit (nixpkgs) lib;
 in rec {
   loadModules' = src: _inputs: args:
@@ -21,9 +21,10 @@ in rec {
     let
       readDirShallow = dir: predicate:
         lib.mapAttrsToList (k: _: k)
-        (lib.filterAttrs (_name: type: predicate type) (builtins.readDir dir));
+        (lib.filterAttrs (_name: predicate) (builtins.readDir dir));
     in lib.fix (_all_user_cells:
-      root.utilities.genAttrs' (readDirShallow src (t: t == "directory")) (user: {
+      root.utilities.genAttrs' (readDirShallow src (t: t == "directory"))
+      (user: {
         name = user;
         value = lib.fix (_user_cell:
           root.utilities.genAttrs'
@@ -36,9 +37,10 @@ in rec {
           }));
       }));
 
-  mkConfiguration = inputs: { system, user, types ? [ ], commonModules ? [ ]
-    , platformModules ? [ ], platformStateVersion ? 4, homeModules ? [ ]
-    , homeStateVersion ? "23.05", }:
+  mkConfiguration = inputs:
+    { system, user, types ? [ ], commonModules ? [ ], platformModules ? [ ]
+    , platformStateVersion ? 4, homeModules ? [ ], homeStateVersion ? "23.05",
+    }:
     let
       inherit (inputs) cells;
       inherit (root.systems) systemTypes;
@@ -78,7 +80,7 @@ in rec {
     in {
       imports = commonModules ++ commonSuites ++ platformModules
         ++ platformSuites;
-      
+
       rebar.flake = inputs.self;
 
       cobalt = {

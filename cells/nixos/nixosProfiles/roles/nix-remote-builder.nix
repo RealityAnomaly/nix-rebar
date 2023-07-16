@@ -1,9 +1,7 @@
 { root, inputs, cell, ... }:
 { self, config, lib, pkgs, ... }:
-let
-  cfg = config.rebar.roles.nix-remote-builder;
-in
-{
+let cfg = config.rebar.roles.nix-remote-builder;
+in {
   options.rebar.roles.nix-remote-builder = {
     schedulerPublicKeys = lib.mkOption {
       description = "SSH public keys of the central build scheduler";
@@ -15,21 +13,24 @@ in
     # Garbage-collect often
     nix.gc.automatic = true;
     nix.gc.dates = "*:45";
-    nix.gc.options = ''--max-freed "$((128 * 1024**3 - 1024 * $(df -P -k /nix/store | tail -n 1 | ${pkgs.gawk}/bin/awk '{ print $4 }')))"'';
+    nix.gc.options = ''
+      --max-freed "$((128 * 1024**3 - 1024 * $(df -P -k /nix/store | tail -n 1 | ${pkgs.gawk}/bin/awk '{ print $4 }')))"'';
 
     # Randomize GC to avoid thundering herd effects.
     nix.gc.randomizedDelaySec = "1800";
 
     # Allow more open files for non-root users to run NixOS VM tests.
-    security.pam.loginLimits = [
-      { domain = "*"; item = "nofile"; type = "-"; value = "20480"; }
-    ];
+    security.pam.loginLimits = [{
+      domain = "*";
+      item = "nofile";
+      type = "-";
+      value = "20480";
+    }];
 
     # Give restricted SSH access to the build scheduler
-    users.users.nix-remote-builder.openssh.authorizedKeys.keys = map
-      (key:
-        ''command="nix-daemon --stdio",no-agent-forwarding,no-port-forwarding,no-pty,no-user-rc,no-X11-forwarding ${key}''
-      )
+    users.users.nix-remote-builder.openssh.authorizedKeys.keys = map (key:
+      ''
+        command="nix-daemon --stdio",no-agent-forwarding,no-port-forwarding,no-pty,no-user-rc,no-X11-forwarding ${key}'')
       cfg.schedulerPublicKeys;
     users.users.nix-remote-builder.isNormalUser = true;
     users.users.nix-remote-builder.group = "nogroup";

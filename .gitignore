@@ -1,0 +1,12 @@
+
+# nixago: ignore-linked-files
+/namaka.toml
+/.prettierrc.json
+/statix.toml
+/lefthook.yml
+/.editorconfig
+/treefmt.toml
+/stylua.toml
+.data
+.direnv
+.nix-overrides

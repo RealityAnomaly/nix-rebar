@@ -1,20 +1,16 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }:
-{
-  imports = [
-    "${modulesPath}/installer/scan/not-detected.nix"
-  ];
+{ self, config, lib, pkgs, modulesPath, ... }: {
+  imports = [ "${modulesPath}/installer/scan/not-detected.nix" ];
 
   config = {
-    assertions = [
-      {
-        assertion = config.systemd.network.networks."10-uplink".networkConfig ? Address;
-        message = ''
-          The machine IPv6 address must be set to
-          `systemd.network.networks."10-uplink".networkConfig.Address`
-        '';
-      }
-    ];
+    assertions = [{
+      assertion = config.systemd.network.networks."10-uplink".networkConfig
+        ? Address;
+      message = ''
+        The machine IPv6 address must be set to
+        `systemd.network.networks."10-uplink".networkConfig.Address`
+      '';
+    }];
 
     boot.initrd.availableKernelModules = [
       "xhci_pci"

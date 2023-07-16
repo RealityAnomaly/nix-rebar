@@ -1,9 +1,6 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
-{
-  imports = [
-    root.core.utilities.upgrade-diff
-  ];
+{ self, config, lib, pkgs, ... }: {
+  imports = [ root.core.utilities.upgrade-diff ];
 
   programs = {
     # setcap wrappers for security hardening

@@ -2,8 +2,7 @@
 { self, config, lib, pkgs, ... }: # scope::eval-config
 let l = inputs.nixpkgs.lib // builtins;
 in {
-  imports =
-    [ root.core.nix.optimise-store ];
+  imports = [ root.core.nix.optimise-store ];
 
   # These should (must?) be enabled in any recent multi-user Nix installation,
   # and yet they remain disabled by default in nix-darwin...

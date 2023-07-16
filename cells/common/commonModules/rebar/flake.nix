@@ -1,8 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: let
-  inherit (pkgs.stdenv.hostPlatform) isDarwin;
-  cfg = config.rebar;
-in {
+{ self, config, lib, pkgs, ... }: {
   options.rebar = {
     flake = lib.mkOption {
       # FIXME what is the type of a flake?

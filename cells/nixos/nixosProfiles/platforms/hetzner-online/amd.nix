@@ -1,9 +1,6 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }:
-{
-  imports = [
-    root.platforms.hetzner-online.default
-  ];
+{ self, config, lib, pkgs, modulesPath, ... }: {
+  imports = [ root.platforms.hetzner-online.default ];
 
   boot.kernelModules = [ "kvm-amd" ];
   hardware.cpu.amd.updateMicrocode =

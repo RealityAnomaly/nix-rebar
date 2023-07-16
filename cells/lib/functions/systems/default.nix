@@ -1,8 +1,4 @@
-{ root, inputs, cell, }:
-let
-  inherit (inputs) nixpkgs;
-  inherit (nixpkgs) lib;
-in rec {
+{ root, inputs, cell, }: rec {
   homePath = pkgs: user:
     let inherit (pkgs.stdenv) hostPlatform;
     in if hostPlatform.isDarwin then
