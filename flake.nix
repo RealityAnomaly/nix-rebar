@@ -105,10 +105,11 @@
       cellBlocks = with std.blockTypes;
         with hive.blockTypes; [
           # Library functions
+          (functions "checks")
           #(data "data")
-          (devshells "devshells")
+          (devshells "devshells" { ci.build = true; })
           #(installables "packages")
-          (namaka "snapshots")
+          (namaka "snapshots" { ci.check = true; })
           (nixago "config")
           #(pkgs "overrides")
           #(files "files")
@@ -137,8 +138,10 @@
       # winnow :: system.cell.block.target -> system.target (filtered version of harvest)
 
       #packages = std.harvest inputs.self [ "common" "packages" ];
-      checks =
-        std.harvest inputs.self [ "tests" "snapshots" "default" "check" ];
+      checks = std.harvest inputs.self [
+        [ "_repository" "snapshots" "default" "check" ] # namaka snapshot tests
+        [ "nixos" "checks" ]
+      ];
       devShells = hive.harvest inputs.self [ "_repository" "devshells" ];
       functions = std.pick inputs.self [ "lib" "functions" ];
 

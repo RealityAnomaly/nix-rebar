@@ -1,4 +1,4 @@
 {
-  check.cmd = [ "std" "//tests/snapshots/default:eval" ];
-  eval.cmd = [ "std" "//tests/snapshots/default:eval" ];
+  check.cmd = [ "std" "//_repository/snapshots/default:eval" ];
+  eval.cmd = [ "std" "//_repository/snapshots/default:eval" ];
 }
