@@ -10,4 +10,5 @@
 .cache
 .data
 .direnv
+.local
 .nix-overrides
