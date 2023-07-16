@@ -10,6 +10,17 @@
       url = "github:nix-community/haumea";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hive = {
+      url = "github:divnix/hive";
+      inputs = {
+        colmena.follows = "colmena";
+        disko.follows = "disko";
+        haumea.follows = "haumea";
+        home.follows = "home";
+        home-manager.url = "github:divnix/blank";
+        nixos-generators.follows = "nixos-generators";
+      };
+    };
     home = {
       url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,6 +31,9 @@
       inputs.nixago.follows = "nixago";
     };
 
+    # intrinsic::packages
+    colmena.url = "github:zhaofengli/colmena";
+
     # platform::universal
     agenix.url = "github:ryantm/agenix";
     ragenix.url = "github:yaxitech/ragenix";
@@ -29,10 +43,11 @@
     disko.url = "github:nix-community/disko";
     impermanence.url = "github:nix-community/impermanence";
     nixos-hardware.url = "github:nixos/nixos-hardware";
+    nixos-generators.url = "github:nix-community/nixos-generators";
   };
 
-  outputs = { self, std, nixpkgs, ... }@inputs:
-    std.growOn {
+  outputs = { self, std, nixpkgs, hive, ... }@inputs:
+    hive.growOn {
       inherit inputs;
 
       nixpkgsConfig = { allowUnfree = true; };
@@ -45,29 +60,33 @@
       ];
 
       cellsFrom = ./cells;
-      cellBlocks = with std.blockTypes; [
-        # Library functions
-        (data "data")
-        (devshells "devshells")
-        (installables "packages")
-        (pkgs "overrides")
-        (files "files")
-        (functions "functions")
-        (functions "overlays")
+      cellBlocks = with std.blockTypes; 
+        with hive.blockTypes; [
+          # Library functions
+          #(data "data")
+          #(devshells "devshells")
+          #(installables "packages")
+          #(pkgs "overrides")
+          #(files "files")
+          (functions "functions")
+          #(functions "overlays")
 
-        # Modules
-        (functions "commonModules")
-        (functions "nixosModules")
-        (functions "darwinModules")
-        (functions "homeModules")
+          # Modules
+          (functions "commonModules")
+          (functions "nixosModules")
+          (functions "darwinModules")
+          (functions "homeModules")
 
-        # Profiles
-        (functions "commonProfiles")
-        (functions "nixosProfiles")
-        (functions "darwinProfiles")
-        (functions "homeProfiles")
-        (functions "devshellProfiles")
-      ];
+          # Profiles
+          (functions "commonProfiles")
+          (functions "nixosProfiles")
+          (functions "darwinProfiles")
+          (functions "homeProfiles")
+          (functions "devshellProfiles")
+
+          # Configurations
+          diskoConfigurations
+        ];
     }
     {
       #packages = std.harvest inputs.self [ "common" "packages" ];
@@ -83,5 +102,7 @@
       darwinProfiles = std.harvest inputs.self [ "darwin" "darwinProfiles" ];
       #homeProfiles = std.harvest inputs.self [ "home" "homeProfiles" ];
       devshellProfiles = std.harvest inputs.self [ "common" "devshellProfiles" ];
+
+      diskoConfigurations = hive.collect self "diskoConfigurations";
     };
 }
