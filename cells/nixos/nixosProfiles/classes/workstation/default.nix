@@ -1,12 +1,19 @@
 { root, inputs, cell, ... }:
 { self, config, lib, pkgs, ... }: {
   imports = [
-    root.classes.personal.nfs-fixes
-    root.classes.personal.updates
+    root.classes.workstation.nfs-fixes
+    root.classes.workstation.pipewire
+    root.classes.workstation.updates
 
     # enable smart card support for workstations
     root.security.smartcard
   ];
+
+  # The default configuration might put the console on the wrong output and we won't get any boot logs or cryptsetup prompts
+  rebar.boot.consoles = lib.mkDefault [ ];
+
+  # improve desktop responsiveness when updating the system
+  nix.daemonCPUSchedPolicy = "idle";
 
   boot.kernel.sysctl = {
     # bump up the inotify max watches to fix some file refresh issues
@@ -102,16 +109,14 @@
     firejail.enable = true;
   };
 
-  environment.systemPackages = with pkgs; [ home-manager ];
+  # hardware.pulseaudio = {
+  #   zeroconf = {
+  #     publish.enable = true;
+  #     discovery.enable = true;
+  #   };
 
-  hardware.pulseaudio = {
-    zeroconf = {
-      publish.enable = true;
-      discovery.enable = true;
-    };
-
-    tcp.enable = true;
-  };
+  #   tcp.enable = true;
+  # };
 
   # link the nixos config in the persistent volume to the temporary volume
   # TODO: SHOULD NOT BE IN HERE!! Should be under a mkIf guard once I add profile conditionals

@@ -16,6 +16,6 @@
     };
 
     # enable the system MTA
-    postfix.enable = true;
+    postfix.enable = lib.mkDefault true;
   };
 }

@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }: # scope::cell
 { self, config, lib, pkgs, ... }: # scope::eval-config
 {
-  hardware.enableRedistributableFirmware = true;
+  hardware.enableRedistributableFirmware = lib.mkDefault true;
 }

@@ -6,6 +6,7 @@
     root.core.nix.substituters.nix-community
     root.core.nix.substituters.nixpkgs-update
     root.core.nix.substituters.nixpkgs-wayland
+    root.core.nix.substituters.numtide
   ];
 
   nix.settings = {
