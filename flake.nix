@@ -4,12 +4,18 @@
   inputs = {
     # intrinsic::channels
     nixpkgs.follows = "nixpkgs-stable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.follows = "nixos-stable";
+    nixpkgs-unstable.url = "nixos-unstable";
+    nixos-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # intrinsic::libraries
     arion = {
       url = "github:hercules-ci/arion";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    darwin = {
+      url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     devshell = {
@@ -79,6 +85,7 @@
 
     # intrinsic::packages
     colmena.url = "github:zhaofengli/colmena";
+    deploy-rs.url = "github:serokell/deploy-rs";
 
     # platform::universal
     agenix.url = "github:ryantm/agenix";

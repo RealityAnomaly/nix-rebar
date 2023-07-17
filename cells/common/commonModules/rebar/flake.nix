@@ -1,10 +1,20 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ self, config, lib, pkgs, ... }:
+let cfg = config.rebar;
+in {
   options.rebar = {
+    inputs = lib.mkOption {
+      type = lib.types.nullOr lib.types.raw;
+      default = null;
+      description = lib.mdDoc ''
+        The inputs of the parent flake.
+      '';
+    };
+
     flake = lib.mkOption {
       # FIXME what is the type of a flake?
       type = lib.types.nullOr lib.types.raw;
-      default = null;
+      default = cfg.inputs.self;
       description = lib.mdDoc ''
         Flake that contains the nixos configuration.
       '';

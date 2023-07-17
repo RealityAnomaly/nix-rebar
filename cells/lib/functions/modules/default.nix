@@ -82,8 +82,9 @@ in rec {
         ++ platformSuites;
 
       rebar = {
+        inherit inputs;
+
         enable = true;
-        flake = inputs.self;
         host = { inherit system; };
         users.${user} = {
           enable = true;

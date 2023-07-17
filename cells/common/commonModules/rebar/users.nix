@@ -1,7 +1,7 @@
 { root, inputs, cell, ... }: # scope::cell
 { self, config, lib, pkgs, ... }: # scope::eval-config
 let
-  inherit (inputs) cells nix-rebar;
+  inherit (inputs) cells;
   inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
 
   cfg = config.rebar;
@@ -9,7 +9,7 @@ let
   isEligiblePlatform = isLinux || isDarwin;
 
   # cells pulled from the input flake
-  flakeCells = cfg.flake.inputs.cells;
+  flakeCells = cfg.inputs.cells;
 
   userType = lib.types.submodule ({ _config, ... }: {
     options = {
@@ -58,7 +58,7 @@ in {
     (lib.mkIf (cfg.enable && isEligiblePlatform) {
       users.users = lib.mapAttrs (name: user:
         {
-          home = nix-rebar.functions.systems.homePath pkgs name;
+          home = cells.lib.functions.systems.homePath pkgs name;
           shell = lib.mkIf isDarwin (lib.mkDefault pkgs.zsh);
         } // (lib.optionalAttrs isNixos {
           # determine what groups we should add the user to automatically
