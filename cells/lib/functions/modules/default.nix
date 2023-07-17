@@ -81,10 +81,9 @@ in rec {
       imports = commonModules ++ commonSuites ++ platformModules
         ++ platformSuites;
 
-      rebar.flake = inputs.self;
-
-      cobalt = {
+      rebar = {
         enable = true;
+        flake = inputs.self;
         host = { inherit system; };
         users.${user} = {
           enable = true;

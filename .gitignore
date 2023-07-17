@@ -7,8 +7,8 @@
 /.editorconfig
 /treefmt.toml
 /stylua.toml
-.cache
-.data
-.direnv
-.local
-.nix-overrides
+/.cache
+/.data
+/.direnv
+/.local
+/.nix-overrides
