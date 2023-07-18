@@ -3,9 +3,9 @@
 
   inputs = {
     # intrinsic::channels
-    nixpkgs.follows = "nixpkgs-stable";
+    nixpkgs.follows = "nixos-stable";
     nixpkgs-stable.follows = "nixos-stable";
-    nixpkgs-unstable.url = "nixos-unstable";
+    nixpkgs-unstable.follows = "nixos-unstable";
     nixos-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -35,6 +35,7 @@
         home.follows = "home";
         home-manager.url = "github:divnix/blank";
         nixos-generators.follows = "nixos-generators";
+        nixpkgs.follows = "nixpkgs";
         paisano.follows = "paisano";
       };
     };
@@ -137,33 +138,35 @@
           (functions "devshellProfiles")
 
           # Configurations
+          nixosConfigurations
           diskoConfigurations
         ];
     } {
+      # collect :: collects everything, no cell block ref is necessary
       # harvest :: system.cell.block.target -> system.target
       # pick :: system.cell.block.target -> target (no system is necessary)
       # winnow :: system.cell.block.target -> system.target (filtered version of harvest)
 
       #packages = std.harvest inputs.self [ "common" "packages" ];
-      checks = std.harvest inputs.self [
+      checks = std.harvest self [
         [ "_repository" "snapshots" "default" "check" ] # namaka snapshot tests
         [ "nixos" "checks" ]
       ];
-      devShells = hive.harvest inputs.self [ "_repository" "devshells" ];
-      functions = std.pick inputs.self [ "lib" "functions" ];
+      devShells = hive.harvest self [ "_repository" "devshells" ];
+      functions = std.pick self [ "lib" "functions" ];
 
-      commonModules = std.pick inputs.self [ "common" "commonModules" ];
-      nixosModules = std.pick inputs.self [ "nixos" "nixosModules" ];
-      #darwinModules = std.pick inputs.self [ "darwin" "darwinModules" ];
-      #homeModules = std.pick inputs.self [ "home" "homeModules" ];
+      commonModules = std.pick self [ "common" "commonModules" ];
+      nixosModules = std.pick self [ "nixos" "nixosModules" ];
+      darwinModules = std.pick self [ "darwin" "darwinModules" ];
+      #homeModules = std.pick self [ "home" "homeModules" ];
 
-      commonProfiles = std.harvest inputs.self [ "common" "commonProfiles" ];
-      nixosProfiles = std.harvest inputs.self [ "nixos" "nixosProfiles" ];
-      darwinProfiles = std.harvest inputs.self [ "darwin" "darwinProfiles" ];
-      #homeProfiles = std.harvest inputs.self [ "home" "homeProfiles" ];
-      devshellProfiles =
-        std.harvest inputs.self [ "common" "devshellProfiles" ];
+      commonProfiles = std.harvest self [ "common" "commonProfiles" ];
+      nixosProfiles = std.harvest self [ "nixos" "nixosProfiles" ];
+      darwinProfiles = std.harvest self [ "darwin" "darwinProfiles" ];
+      #homeProfiles = std.harvest self [ "home" "homeProfiles" ];
+      devshellProfiles = std.harvest self [ "common" "devshellProfiles" ];
 
+      nixosConfigurations = hive.collect self "nixosConfigurations";
       diskoConfigurations = hive.collect self "diskoConfigurations";
     };
 }

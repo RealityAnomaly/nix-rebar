@@ -4,10 +4,9 @@ let inherit (lib) mkDefault;
 in {
   # This is a subset of the security hardening configuration present in nixpkgs
   # The goal here is to turn on as many hardening options as we can without sacrificing performance or usability
-  nix = {
-    useSandbox = true;
-    allowedUsers = [ "@users" ];
-    trustedUsers = [ "root" "@wheel" ];
+  nix.settings = {
+    allowed-users = [ "@users" "@wheel" ];
+    trusted-users = [ "root" "@wheel" ];
   };
 
   networking.firewall = {

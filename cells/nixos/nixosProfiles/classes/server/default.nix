@@ -6,7 +6,7 @@
     root.classes.server.trim
 
     # enable SSH by default for servers
-    root.security.sshd
+    root.security.sshd.default
   ];
 
   security = {
