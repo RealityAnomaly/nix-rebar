@@ -2,14 +2,14 @@
 { self, config, lib, pkgs, ... }: # scope::eval-config
 let
   inherit (inputs) cells;
+  inherit (cells.lib) functions;
   inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
+
+  inherit (functions.modules) extractSuites;
 
   cfg = config.rebar;
   isNixos = isLinux && !isDarwin;
   isEligiblePlatform = isLinux || isDarwin;
-
-  # cells pulled from the input flake
-  flakeCells = cfg.inputs.cells;
 
   userType = lib.types.submodule ({ _config, ... }: {
     options = {
@@ -38,6 +38,14 @@ let
         pgp = { fingerprint = lib.mkOption { type = lib.types.str; }; };
         ssh = lib.mkOption { type = lib.types.listOf lib.types.str; };
       };
+
+      home = {
+        enable = lib.mkEnableOption "home-manager";
+        stateVersion = lib.mkOption {
+          type = lib.types.str;
+          description = "The version of the home state to use";
+        };
+      };
     };
   });
 in {
@@ -51,11 +59,12 @@ in {
       ++ (lib.optional config.services.mysql.enable "mysql")
       ++ (lib.optional config.virtualisation.docker.enable "docker");
   in lib.mkMerge [
-    {
-      # pull in default per-user metadata from the common cell
-      rebar.users = flakeCells.common.data.peers.users;
-    }
     (lib.mkIf (cfg.enable && isEligiblePlatform) {
+      assertions = [{
+        assertion = (builtins.length (builtins.attrNames cfg.users)) > 0;
+        message = "At least one user must be defined";
+      }];
+
       users.users = lib.mapAttrs (name: user:
         {
           home = cells.lib.functions.systems.homePath pkgs name;
@@ -72,6 +81,16 @@ in {
         inherit name;
         value = { members = privilegedUsers; };
       }) groups);
+
+      home-manager.users = lib.mapAttrs (name: user: _':
+        let
+          cells' = cfg.inputs.cells;
+          homeSuites =
+            extractSuites cfg.host [ ] cells'.common.users.${name}.homeSuites;
+        in {
+          imports = homeSuites;
+          home = { inherit (user.home) stateVersion; };
+        }) (lib.filterAttrs (_: user: user.home.enable) enabledUsers);
     })
   ];
 }

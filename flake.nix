@@ -22,6 +22,7 @@
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-parts.url = "github:hercules-ci/flake-parts";
     haumea = {
       url = "github:nix-community/haumea";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,8 +33,7 @@
         colmena.follows = "colmena";
         disko.follows = "disko";
         haumea.follows = "haumea";
-        home.follows = "home";
-        home-manager.url = "github:divnix/blank";
+        home-manager.follows = "home";
         nixos-generators.follows = "nixos-generators";
         nixpkgs.follows = "nixpkgs";
         paisano.follows = "paisano";
@@ -85,7 +85,7 @@
     };
 
     # intrinsic::packages
-    colmena.url = "github:zhaofengli/colmena";
+    colmena.url = "github:zhaofengli/colmena/v0.4.0";
     deploy-rs.url = "github:serokell/deploy-rs";
 
     # platform::universal

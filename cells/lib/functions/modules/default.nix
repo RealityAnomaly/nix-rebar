@@ -37,33 +37,36 @@ in rec {
           }));
       }));
 
+  extractSuites = { system, types, ... }:
+    path: root':
+    let
+      inherit (root.systems) systemTypes;
+      parsedSystem = lib.systems.elaborate system;
+
+      # eval the "predicate" attribute if it exists
+      autoTypes = lib.mapAttrsToList (n: _: n) (lib.filterAttrs (_: v:
+        let predicate = v.predicate or (_: false);
+        in predicate parsedSystem) systemTypes);
+
+      filteredTypes = lib.unique ((map (t: t.name) (types ++ [
+        systemTypes.core # default system type
+      ])) ++ autoTypes);
+    in lib.unique (lib.remove null
+      (map (type: lib.attrByPath (path ++ [ "_system_${type}" ]) null root')
+        filteredTypes));
+
   mkConfiguration = inputs:
-    { system, user, types ? [ ], commonModules ? [ ], platformModules ? [ ]
-    , platformStateVersion ? 4, homeModules ? [ ], homeStateVersion ? "23.05",
-    }:
+    { system, types ? [ ], commonModules ? [ ], platformModules ? [ ]
+    , platformStateVersion ? 4, homeModules ? [ ], }:
+    defaultModule:
     let
       inherit (inputs) cells;
-      inherit (root.systems) systemTypes;
 
       # parse the system string provided and extract its type
       parsedSystem = lib.systems.elaborate system;
+      extractSuites' = extractSuites { inherit system types; };
 
-      # extract all our necessary suites
-      extractSuites = path: root:
-        let
-          # eval the "predicate" attribute if it exists
-          autoTypes = lib.mapAttrsToList (n: _: n) (lib.filterAttrs (_: v:
-            let predicate = v.predicate or (_: false);
-            in predicate parsedSystem) systemTypes);
-
-          filteredTypes = lib.unique ((map (t: t.name) (types ++ [
-            systemTypes.core # default system type
-          ])) ++ autoTypes);
-        in lib.unique (lib.remove null
-          (map (type: lib.attrByPath (path ++ [ "_system_${type}" ]) null root)
-            filteredTypes));
-
-      commonSuites = extractSuites [ ] cells.common.commonSuites;
+      commonSuites = extractSuites' [ ] cells.common.commonSuites;
       platformSuites = let
         platform = if parsedSystem.isDarwin then
           cells.darwin.darwinSuites
@@ -71,32 +74,20 @@ in rec {
           cells.nixos.nixosSuites
         else
           throw "Unsupported system type";
-      in extractSuites [ ] platform;
-      homeSuites = extractSuites [ ] cells.home.homeSuites;
-
-      _user = {
-        homeSuites = extractSuites [ ] cells.common.users.${user}.homeSuites;
-      };
+      in extractSuites' [ ] platform;
+      homeSuites = extractSuites' [ ] cells.home.homeSuites;
     in {
       imports = commonModules ++ commonSuites ++ platformModules
-        ++ platformSuites;
+        ++ platformSuites ++ [ defaultModule ];
 
       rebar = {
         inherit inputs;
 
         enable = true;
-        host = { inherit system; };
-        users.${user} = {
-          enable = true;
-          privileged = true;
-        };
+        host = { inherit system types; };
       };
 
-      home-manager.users.${user} = _: {
-        imports = homeModules ++ homeSuites ++ _user.homeSuites;
-        home.stateVersion = homeStateVersion;
-      };
-
+      home-manager.sharedModules = homeModules ++ homeSuites;
       system = { stateVersion = platformStateVersion; };
     };
 

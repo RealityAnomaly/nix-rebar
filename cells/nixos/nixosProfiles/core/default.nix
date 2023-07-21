@@ -1,8 +1,12 @@
-{ root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
-{
+{ root, inputs, cell, ... }:
+{ self, config, lib, pkgs, ... }:
+let inherit (inputs) cells;
+in {
   imports = [
     cell.nixosModules.default # import cell modules
+
+    # import the base profile for all platforms
+    cells.common.commonProfiles.core.default
 
     # third-party modules we also always load
     inputs.disko.nixosModules.disko

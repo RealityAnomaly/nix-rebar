@@ -5,7 +5,7 @@ let
   inherit (nixpkgs.stdenv) isLinux;
 
   l = inputs.nixpkgs.lib // builtins;
-  cats = pkgCategories [ "formatting" "utils" ];
+  cats = pkgCategories [ "formatting" "ops" "utils" ];
 
   commonCommands = [
     (cats.formatting nixpkgs.deadnix { })
@@ -13,6 +13,8 @@ let
     (cats.formatting nixpkgs.nodePackages.prettier { })
     (cats.utils nixpkgs.shellcheck { })
     (cats.formatting nixpkgs.statix { })
+
+    (cats.ops nixpkgs.colmena { })
 
     (cats.utils inputs.ragenix.packages.ragenix { })
     (cats.utils nixpkgs.cachix { })

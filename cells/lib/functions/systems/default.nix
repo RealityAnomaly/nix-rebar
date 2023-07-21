@@ -11,6 +11,7 @@
   systemTypes = let
     types = [
       { name = "core"; }
+      { name = "server"; }
       { name = "workstation"; }
       {
         name = "graphical";
