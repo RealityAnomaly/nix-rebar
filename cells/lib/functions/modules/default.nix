@@ -57,7 +57,7 @@ in rec {
 
   mkConfiguration = inputs:
     { system, types ? [ ], commonModules ? [ ], platformModules ? [ ]
-    , platformStateVersion ? 4, homeModules ? [ ], }:
+    , platformStateVersion, homeModules ? [ ], }:
     defaultModule:
     let
       inherit (inputs) cells;

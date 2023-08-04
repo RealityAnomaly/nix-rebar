@@ -7,35 +7,29 @@
         type = "disk";
         content = {
           type = "gpt";
-          partitions = [
-            {
-              name = "boot";
-              start = "0";
-              end = "1M";
-              flags = [ "bios_grub" ];
-            }
-            {
-              name = "ESP";
-              start = "1M";
-              end = "512M";
-              bootable = true;
+          partitions = {
+            boot = {
+              size = "1M";
+              type = "EF02"; # for grub MBR
+            };
+            ESP = {
+              size = "512M";
+              type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
               };
-            }
-            {
-              name = "root";
-              start = "512M";
-              end = "100%";
+            };
+            root = {
+              size = "100%";
               content = {
                 type = "filesystem";
                 format = "bcachefs";
                 mountpoint = "/";
               };
-            }
-          ];
+            };
+          };
         };
       };
     };

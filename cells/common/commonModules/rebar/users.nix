@@ -11,7 +11,7 @@ let
   isNixos = isLinux && !isDarwin;
   isEligiblePlatform = isLinux || isDarwin;
 
-  userType = lib.types.submodule ({ _config, ... }: {
+  userType = lib.types.submodule ({ config, ... }: {
     options = {
       enable = lib.mkEnableOption "User";
 
@@ -28,7 +28,7 @@ let
         lastName = lib.mkOption { type = lib.types.str; };
         fullName = lib.mkOption {
           type = lib.types.str;
-          default = "${_config.contact.firstName} ${_config.contact.lastName}";
+          default = "${config.contact.firstName} ${config.contact.lastName}";
         };
         email = lib.mkOption { type = lib.types.str; };
         platforms = { github = lib.mkOption { type = lib.types.str; }; };
@@ -54,8 +54,8 @@ in {
   config = let
     enabledUsers = lib.filterAttrs (_: user: user.enable) cfg.users;
     privilegedUsers = lib.filterAttrs (_: user: user.privileged) enabledUsers;
-    privilegedGroups =
-      (lib.optional config.networking.networkmanager.enable "networkmanager")
+    privilegedGroups = [ "wheel" ]
+      ++ (lib.optional config.networking.networkmanager.enable "networkmanager")
       ++ (lib.optional config.services.mysql.enable "mysql")
       ++ (lib.optional config.virtualisation.docker.enable "docker");
   in lib.mkMerge [
@@ -71,7 +71,10 @@ in {
           shell = lib.mkIf isDarwin (lib.mkDefault pkgs.zsh);
         } // (lib.optionalAttrs isNixos {
           # determine what groups we should add the user to automatically
+          group = name;
+          isNormalUser = true;
           extraGroups = lib.mkIf user.privileged privilegedGroups;
+          openssh.authorizedKeys.keys = user.keys.ssh;
         })) enabledUsers;
 
       # add the users to groups if they are privileged
