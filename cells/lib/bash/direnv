@@ -17,36 +17,46 @@ Find hash:
 # signature direnv & nixago output styling
 export DIRENV_LOG_FORMAT=$'\E[mdirenv: \E[38;5;8m%s\E[m'
 
-# load param overrides file (if it exists)
-export NIX_PARAM_OVERRIDES
-if [ -e ".nix-overrides" ]; then
-  NIX_PARAM_OVERRIDES=$(eval "echo $(tr '\n' ' ' < .nix-overrides)")
-  echo "rebar: using the following parameter overrides from .nix-overrides: $NIX_PARAM_OVERRIDES"
-fi
-
 alias_dir="$PWD/.direnv/aliases"
 rm -rf "$alias_dir"
 mkdir -p "$alias_dir"
-if ! [[ ":$PATH:" == *":$alias_dir:"* ]]; then
-  PATH_add "$alias_dir"
+
+function create_tfo_wrapper() {
+	cat << EOF > "$PWD/.direnv/aliases/tfo"
+#!/usr/bin/env bash
+# temporary flake override utility
+
+backup_file="\$PRJ_ROOT/.flake.lock.bak"
+
+if [ -e "\$backup_file" ]; then
+	echo "error: backup file already exists"
+	echo "two instances of TFO cannot run concurrently"
+	echo "please remove the backup file if you are sure none are running"
 fi
 
-function create_nix_wrapper() {
-	local wrapper_name="$2"
-	cat << EOF > "$PWD/.direnv/aliases/$wrapper_name"
-#!/usr/bin/env bash
-IFS=' ' read -r -a param_overrides <<< "\$NIX_PARAM_OVERRIDES"
-nix_invocation_params=("$1" "\$@" "\${param_overrides[@]}")
+function cleanup {
+	if [ -e "\$backup_file" ]; then
+		mv "\$backup_file" "\$PRJ_ROOT/flake.lock"
+	fi
+}
+trap cleanup EXIT
 
-"\${nix_invocation_params[@]}"
+overrides_file="\$PRJ_ROOT/.nix-overrides"
+if [ -e "\$overrides_file" ]; then
+  overrides=\$(eval "echo \$(tr '\n' ' ' < "\$overrides_file")")
+  echo "TFO: using the following parameter overrides from .nix-overrides: \$overrides"
+fi
+
+cp "\$PRJ_ROOT/flake.lock" "\$backup_file"
+IFS=' ' read -r -a param_overrides <<< "\$overrides"
+nix_invocation_params=("nix" "flake" "lock" "\${param_overrides[@]}")
+"\${nix_invocation_params[@]}" > /dev/null 2>&1
+
+\$@
 EOF
 
-	chmod +x "$PWD/.direnv/aliases/$wrapper_name"
+	chmod +x "$PWD/.direnv/aliases/tfo"
 }
-
-create_nix_wrapper nix nix-override
-create_nix_wrapper nixos-rebuild nixos-rebuild-override
-create_nix_wrapper darwin-rebuild darwin-rebuild-override
 
 { # PRJ Base Directory Specification: https://github.com/numtide/prj-spec
 	# shellcheck source=/dev/null
@@ -73,7 +83,7 @@ create_nix_wrapper darwin-rebuild darwin-rebuild-override
 	)
 	nix_eval=("eval" "${nix_eval_args[@]}")
   nix_eval_real=("${nix[@]}" "${nix_eval[@]}")
-  #nix_eval_fake=("nix-override" "${nix_eval[@]}")
+  #nix_eval_fake=("nix" "${nix_eval[@]}")
 	nix_build_args=(
 		"--no-link"
 		"--keep-outputs"
@@ -82,7 +92,7 @@ create_nix_wrapper darwin-rebuild darwin-rebuild-override
 	)
 	nix_build=("build" "${nix_eval_args[@]}" "${nix_build_args[@]}")
   #nix_build_real=("${nix[@]}" "${nix_build[@]}")
-  nix_build_fake=("nix-override" "${nix_build[@]}")
+  nix_build_fake=("nix" "${nix_build[@]}")
 
 	system="$("${nix_eval_real[@]}" 2>/dev/null --raw --impure --expr builtins.currentSystem)"
 	cellsFrom="$("${nix_build_fake[@]}" 2>/dev/null --raw "$registry.cellsFrom")"
@@ -158,5 +168,11 @@ create_nix_wrapper darwin-rebuild darwin-rebuild-override
 			_set_watchers "$target"
 		done
 		use_env "$1"
+
+		create_tfo_wrapper
+
+		if ! [[ ":$PATH:" == *":$alias_dir:"* ]]; then
+			PATH_add "$alias_dir"
+		fi
 	}
 }

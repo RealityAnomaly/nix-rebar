@@ -31,9 +31,9 @@ in {
       min-free = lib.mkDefault (128 * 1000 * 1000);
 
       # TODO: cargo culted.
-      daemonCPUSchedPolicy = lib.mkIf (!isDarwin) (lib.mkDefault "batch");
-      daemonIOSchedClass = lib.mkIf (!isDarwin) (lib.mkDefault "idle");
-      daemonIOSchedPriority = lib.mkIf (!isDarwin) (lib.mkDefault 7);
+      # daemonCPUSchedPolicy = lib.mkIf (!isDarwin) (lib.mkDefault "batch");
+      # daemonIOSchedClass = lib.mkIf (!isDarwin) (lib.mkDefault "idle");
+      # daemonIOSchedPriority = lib.mkIf (!isDarwin) (lib.mkDefault 7);
     };
 
     gc.automatic = true;

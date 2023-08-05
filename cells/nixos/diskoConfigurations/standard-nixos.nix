@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ disks ? [ "/dev/vdb" ], ... }: {
+{ disks ? [ "/dev/vda" ], ... }: {
   disko.devices = {
     disk = {
       vdb = {

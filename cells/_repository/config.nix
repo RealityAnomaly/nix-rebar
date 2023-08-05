@@ -21,14 +21,9 @@ in {
   treefmt = mkNixago std.lib.cfg.treefmt {
     data = import ./config/treefmt.nix;
     packages = [
-      nixpkgs.deadnix
-      nixpkgs.nixfmt
       nixpkgs.nodePackages.eslint
-      nixpkgs.nodePackages.prettier
       nixpkgs.nodePackages.prettier-plugin-toml
       nixpkgs.shfmt
-      nixpkgs.statix
-      nixpkgs.stylua
     ];
     devshell.startup.prettier-plugin-toml = lib.stringsWithDeps.noDepEntry ''
       export NODE_PATH=${nixpkgs.nodePackages.prettier-plugin-toml}/lib/node_modules''${NODE_PATH:+:''${NODE_PATH}}

@@ -22,7 +22,7 @@ in {
 
     symlinkFlake = lib.mkOption {
       type = lib.types.bool;
-      default = true;
+      default = false;
       description = lib.mdDoc ''
         Symlinks the flake the system was built with to `/run/current-system`
         Having access to the flake the system was installed with can be useful for introspection.

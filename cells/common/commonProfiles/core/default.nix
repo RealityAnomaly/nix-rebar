@@ -15,8 +15,6 @@ in {
   environment.variables = rec {
     EDITOR = "vim";
     PAGER = "less -R";
-    LANG = "en_GB.UTF-8";
-    LC_ALL = "en_GB.UTF-8";
     LESS = "-R"; # -iFJMRW -x4
     LESSOPEN = "|${pkgs.lesspipe}/bin/lesspipe.sh %s";
     SYSTEMD_LESS = LESS;

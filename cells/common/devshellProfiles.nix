@@ -21,6 +21,7 @@ let
     (cats.utils inputs.home.packages.default { })
     (cats.utils nixpkgs.just { })
     (cats.utils nixpkgs.nix-diff { })
+    (cats.utils nixpkgs.nix-eval-jobs { })
     (cats.utils nixpkgs.nix-tree { })
     (cats.utils nixpkgs.nvd { })
   ];
