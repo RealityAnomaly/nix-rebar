@@ -1,8 +1,23 @@
 { root, inputs, cell, ... }: # scope::cell
 { self, config, lib, pkgs, ... }: # scope::eval-config
-let inherit (pkgs.stdenv.hostPlatform) isDarwin;
+let
+  inherit (pkgs.stdenv.hostPlatform) isDarwin;
+  _inputs = config.rebar.inputs;
+
+  inputFlakes = lib.filterAttrs (_: v: v ? outputs) _inputs;
+  inputsToPaths = lib.mapAttrs' (n: v: {
+    name = "nix/inputs/${n}";
+    value.source = v.outPath;
+  });
 in {
   imports = [ root.core.nix.substituters.default ];
+
+  # TODO: find out why these two specific values break
+  environment.etc = inputsToPaths (removeAttrs _inputs [
+    # these are internal inputs
+    "cells"
+    "nixpkgs"
+  ]);
 
   nix = {
     package = pkgs.nix;
@@ -41,5 +56,14 @@ in {
     extraOptions = ''
       warn-dirty = false
     '';
+
+    nixPath = [
+      "nixpkgs=${_inputs.nixpkgs}"
+      "home-manager=${_inputs.home}"
+      "darwin=${_inputs.darwin}"
+      "/etc/nix/inputs"
+    ];
+
+    registry = lib.mapAttrs (_: flake: { inherit flake; }) inputFlakes;
   };
 }
