@@ -1,4 +1,4 @@
 { root, inputs, cell, ... }:
 { self, config, lib, pkgs, ... }: {
-  imports = [ root.security.default ];
+  imports = [ root.core.shells.fish root.core.shells.zsh ];
 }

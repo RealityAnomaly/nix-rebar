@@ -1,6 +1,5 @@
-{ root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
-{
+{ root, inputs, cell, ... }:
+{ self, config, lib, pkgs, ... }: {
   nix.settings = {
     substituters = [ "https://nix-community.cachix.org" ];
     trusted-substituters = [ "https://nix-community.cachix.org" ];

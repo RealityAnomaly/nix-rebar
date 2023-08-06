@@ -1,7 +1,7 @@
-{ root, inputs, cell, context, ... }: # scope::cell
+{ root, inputs, cell, ... }: # scope::cell
 { self, config, lib, pkgs, ... }: # scope::eval-config
 let inherit (pkgs.stdenv.hostPlatform) isDarwin;
-in context.mutateModule {
+in {
   imports = [ root.core.nix.substituters.default ];
 
   nix = {

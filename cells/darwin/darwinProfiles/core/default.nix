@@ -3,8 +3,8 @@
 let inherit (inputs) cells;
 in {
   imports = [
-    # # import the base profile for all platforms
-    # cells.common.commonProfiles.core.default
+    # import the base profile for all platforms
+    cells.common.commonProfiles.core.default
 
     # import cell modules
     cell.darwinModules.default

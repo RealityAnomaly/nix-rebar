@@ -1,6 +1,5 @@
-{ root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
-{
+{ root, inputs, cell, ... }:
+{ self, config, lib, pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     age
     age-plugin-yubikey

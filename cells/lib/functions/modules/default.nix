@@ -2,19 +2,30 @@
 let
   inherit (inputs) haumea nixpkgs;
   inherit (nixpkgs) lib;
+
+  # copied from nix's lib/modules.nix
+  applyModuleArgs = key: f:
+    args@{ config, options, lib, ... }:
+    let
+      context = name:
+        ''while evaluating the module argument `${name}' in "${key}":'';
+      extraArgs = builtins.mapAttrs (name: _:
+        builtins.addErrorContext (context name)
+        (args.${name} or config._module.args.${name})) (lib.functionArgs f);
+    in f (args // extraArgs);
 in rec {
-  /* *
-     Load classical Nix modules from a directory using Haumea.
-     Accepts the `args` parameter to pass to Haumea's `load` function.
+  /**
+    Load classical Nix modules from a directory using Haumea.
+    Accepts the `args` parameter to pass to Haumea's `load` function.
 
-     Example:
-       loadModules' ./modules inputs {
-         transformer = haumea.lib.transformers.liftDefault;
-       }
-       => { core = { nix = { default = { ... }; }; }; }
+    Example:
+      loadModules' ./modules inputs {
+        transformer = haumea.lib.transformers.liftDefault;
+      }
+      => { core = { nix = { default = { ... }; }; }; }
 
-     Type:
-       loadModules' :: Path -> AttrSet -> AttrSet -> AttrSet
+    Type:
+      loadModules' :: Path -> AttrSet -> AttrSet -> AttrSet
   */
   loadModules' = src: _inputs: args:
     let
@@ -27,23 +38,23 @@ in rec {
       # available on the nixos module level that can inject our `mutateModule` attribute
       pathLoader = inputs: path:
         let
+          # create a unique key for this module to allow it to be deduplicated across flakes
+          # becomes i.e. /nix/store/3x2hnjvm43r42spyb6kagpp21jki73wn-source#common/commonProfiles/core/nix/default
+          key =
+            "${_inputs.inputs.self.outPath}#${_inputs.cell.__std.cellName}/${_inputs.cell.__std.cellBlockName}/${
+              stripPath path
+            }";
+          mutator = module: module // { inherit key; };
           f = lib.toFunction (import path);
-          inputs' = inputs // {
-            context.mutateModule = module:
-              module // {
-                # create a unique key for this module to allow it to be deduplicated across flakes
-                # becomes i.e. /nix/store/3x2hnjvm43r42spyb6kagpp21jki73wn-source#common/commonProfiles/core/nix/default
-                key =
-                  "${_inputs.inputs.self.outPath}#${_inputs.cell.__std.cellName}/${_inputs.cell.__std.cellBlockName}/${
-                    stripPath path
-                  }";
-              };
-          };
-        in lib.pipe f [
-          lib.functionArgs
-          (lib.mapAttrs (name: _: inputs'.${name}))
-          f
-        ];
+          fn = lib.pipe f [
+            lib.functionArgs
+            (lib.mapAttrs (name: _: inputs.${name}))
+            f
+          ];
+        in if lib.isFunction fn then
+          args: mutator (applyModuleArgs key fn args)
+        else
+          mutator fn;
     in haumea.lib.load ({
       inherit src;
       loader = pathLoader;
@@ -103,7 +114,14 @@ in rec {
             name = lib.removeSuffix ".nix" type;
             value = import "${src}/${user}/${type}" (_inputs // {
               inherit user;
-              cell = _user_cell;
+              cell = _user_cell // {
+                __std.cellName = lib.concatStringsSep "/" [
+                  _inputs.cell.__std.cellName
+                  _inputs.cell.__std.cellBlockName
+                  user
+                ];
+                __std.cellBlockName = type;
+              };
             });
           }));
       }));
