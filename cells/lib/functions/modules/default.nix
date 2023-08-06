@@ -3,20 +3,91 @@ let
   inherit (inputs) haumea nixpkgs;
   inherit (nixpkgs) lib;
 in rec {
+  /* *
+     Load classical Nix modules from a directory using Haumea.
+     Accepts the `args` parameter to pass to Haumea's `load` function.
+
+     Example:
+       loadModules' ./modules inputs {
+         transformer = haumea.lib.transformers.liftDefault;
+       }
+       => { core = { nix = { default = { ... }; }; }; }
+
+     Type:
+       loadModules' :: Path -> AttrSet -> AttrSet -> AttrSet
+  */
   loadModules' = src: _inputs: args:
-    haumea.lib.load ({
+    let
+      # strips the source path prefix & any .nix suffix from the path
+      stripPath = path:
+        let stripped = lib.removePrefix (toString src + "/") (toString path);
+        in lib.removeSuffix ".nix" stripped;
+
+      # the purpose of this pathLoader helper function is to inject a `inner` function
+      # available on the nixos module level that can inject our `mutateModule` attribute
+      pathLoader = inputs: path:
+        let
+          f = lib.toFunction (import path);
+          inputs' = inputs // {
+            context.mutateModule = module:
+              module // {
+                # create a unique key for this module to allow it to be deduplicated across flakes
+                # becomes i.e. /nix/store/3x2hnjvm43r42spyb6kagpp21jki73wn-source#common/commonProfiles/core/nix/default
+                key =
+                  "${_inputs.inputs.self.outPath}#${_inputs.cell.__std.cellName}/${_inputs.cell.__std.cellBlockName}/${
+                    stripPath path
+                  }";
+              };
+          };
+        in lib.pipe f [
+          lib.functionArgs
+          (lib.mapAttrs (name: _: inputs'.${name}))
+          f
+        ];
+    in haumea.lib.load ({
       inherit src;
+      loader = pathLoader;
       inputs = _inputs // { inherit lib; };
     } // args);
 
-  # standardised method of loading Nix eval system's profiles and modules using Haumea
+  /* *
+     Load classical Nix modules from a directory using Haumea.
+
+     Example:
+       loadModules ./modules inputs
+       => { core = { nix = { default = { ... }; }; }; }
+
+     Type:
+       loadModules :: Path -> AttrSet -> AttrSet
+  */
   loadModules = src: _inputs: loadModules' src _inputs { };
+
+  /* *
+     Load classical Nix configurations from a directory using Haumea.
+     The difference between this function and `loadModules` is that it uses the `liftDefault` transformer.
+
+     Example:
+       loadConfigurations ./configurations inputs
+       => { core = { nix = { default = { ... }; }; }; }
+
+     Type:
+       loadConfigurations :: Path -> AttrSet -> AttrSet
+  */
   loadConfigurations = src: _inputs:
     loadModules' src _inputs {
       transformer = haumea.lib.transformers.liftDefault;
     };
 
-  # hacky way of loading users as if they were cells at the top-level
+  /* *
+     Loads a folder of user configurations as if they were Paisano cells.
+     This is useful for loading user configurations in a similar way to how cells are loaded.
+
+     Example:
+       loadUserSubcell ./users inputs
+
+     Type:
+       loadUserSubcell :: Path -> AttrSet -> AttrSet
+  */
   loadUserSubcell = src: _inputs:
     let
       readDirShallow = dir: predicate:
@@ -37,6 +108,17 @@ in rec {
           }));
       }));
 
+  /* *
+     Given suites, extract which suites should be loaded for a given system.
+
+     Example:
+       extractSuites' = { inherit system types; };
+       extractSuites' [ ] cells.common.commonSuites
+       => [ <MODULE> <MODULE> <MODULE> ... ]
+
+     Type:
+       extractSuites :: AttrSet -> [String] -> AttrSet
+  */
   extractSuites = { system, types, ... }:
     path: root':
     let
@@ -55,6 +137,19 @@ in rec {
       (map (type: lib.attrByPath (path ++ [ "_system_${type}" ]) null root')
         filteredTypes));
 
+  /* *
+     Preprocessor for Nix configurations to automatically extract suites based on the system type.
+
+     Example:
+       mkConfiguration inputs {
+         system = "aarch64-darwin";
+         types = [ systemTypes.workstation ];
+         platformStateVersion = 4;
+       } {
+         networking.computerName = "A MacBook Pro";
+       };
+       => { imports = [ ... ]; rebar = { ... }; system = { ... }; }
+  */
   mkConfiguration = inputs:
     { system, types ? [ ], commonModules ? [ ], platformModules ? [ ]
     , platformStateVersion, homeModules ? [ ], }:
@@ -90,6 +185,4 @@ in rec {
       home-manager.sharedModules = homeModules ++ homeSuites;
       system = { stateVersion = platformStateVersion; };
     };
-
-  mkSuite = { auto ? null }: configuration: configuration;
 }

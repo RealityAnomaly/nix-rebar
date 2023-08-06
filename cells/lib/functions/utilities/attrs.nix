@@ -37,6 +37,18 @@ in rec {
   */
   enumAttrs = enum: lib.genAttrs enum (s: s);
 
+  /* *
+     Extracts a single name-value attribute pair from the specified attribute set using the predicate
+  */
+  extractPair = predicate: attrs:
+    let
+      filtered = filterAttrs predicate attrs;
+      name = lib.head (lib.attrNames filtered);
+    in {
+      inherit name;
+      value = attrs.${name};
+    };
+
   # maps attrs to list with an extra i iteration parameter
   imapAttrsToList = f: set:
     (let keys = attrNames set;

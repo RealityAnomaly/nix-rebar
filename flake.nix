@@ -64,7 +64,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     paisano = {
-      url = "github:divnix/paisano";
+      url = "github:VertexA115/paisano-nix-core/feat/cell-introspection";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     std = {

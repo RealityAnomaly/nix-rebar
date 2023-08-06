@@ -1280,16 +1280,17 @@
         "yants": "yants"
       },
       "locked": {
-        "lastModified": 1688099125,
-        "narHash": "sha256-j6LMz00orEKZrQb14wRRw7kMLm+aj7zBJt05AY4UcRI=",
-        "owner": "divnix",
-        "repo": "paisano",
-        "rev": "10270dc46532c947de473ee88c8f5a3346a396fb",
+        "lastModified": 1691337964,
+        "narHash": "sha256-toSra+4XgSug0Qupm7En4VULRxeVU5E9+wpAsFhp3QE=",
+        "owner": "VertexA115",
+        "repo": "paisano-nix-core",
+        "rev": "ac2fcbb448a5a5b364678911fc70957faf9b414a",
         "type": "github"
       },
       "original": {
-        "owner": "divnix",
-        "repo": "paisano",
+        "owner": "VertexA115",
+        "ref": "feat/cell-introspection",
+        "repo": "paisano-nix-core",
         "type": "github"
       }
     },
