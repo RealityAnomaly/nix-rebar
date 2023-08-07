@@ -40,10 +40,9 @@ in rec {
         let
           # create a unique key for this module to allow it to be deduplicated across flakes
           # becomes i.e. /nix/store/3x2hnjvm43r42spyb6kagpp21jki73wn-source#common/commonProfiles/core/nix/default
+          cellSuffix = lib.concatStringsSep "/" _inputs.cell.__cr;
           key =
-            "${_inputs.inputs.self.outPath}#${_inputs.cell.__std.cellName}/${_inputs.cell.__std.cellBlockName}/${
-              stripPath path
-            }";
+            "${_inputs.inputs.self.outPath}#${cellSuffix}/${stripPath path}";
           mutator = module: module // { inherit key; };
           f = lib.toFunction (import path);
           fn = lib.pipe f [
@@ -115,12 +114,7 @@ in rec {
             value = import "${src}/${user}/${type}" (_inputs // {
               inherit user;
               cell = _user_cell // {
-                __std.cellName = lib.concatStringsSep "/" [
-                  _inputs.cell.__std.cellName
-                  _inputs.cell.__std.cellBlockName
-                  user
-                ];
-                __std.cellBlockName = type;
+                __cr = _inputs.cell.__cr ++ [ user type ];
               };
             });
           }));

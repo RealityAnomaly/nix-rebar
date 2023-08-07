@@ -1280,11 +1280,11 @@
         "yants": "yants"
       },
       "locked": {
-        "lastModified": 1691337964,
-        "narHash": "sha256-toSra+4XgSug0Qupm7En4VULRxeVU5E9+wpAsFhp3QE=",
+        "lastModified": 1691373728,
+        "narHash": "sha256-9izEr9crBjoBk4ecuTyFVYwjbXo1VjClRN1eaGITeag=",
         "owner": "VertexA115",
         "repo": "paisano-nix-core",
-        "rev": "ac2fcbb448a5a5b364678911fc70957faf9b414a",
+        "rev": "727ccec905a9235315a0ab650ad4f8afcdf7f73f",
         "type": "github"
       },
       "original": {
