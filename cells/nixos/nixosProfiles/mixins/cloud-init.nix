@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   services.cloud-init = {
     enable = lib.mkDefault true;
     network.enable = lib.mkDefault true;

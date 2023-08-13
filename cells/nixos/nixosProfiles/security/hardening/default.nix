@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let inherit (lib) mkDefault;
 in {
   # This is a subset of the security hardening configuration present in nixpkgs

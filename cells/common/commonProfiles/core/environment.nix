@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   environment = {
     variables = rec {
       EDITOR = "vim";

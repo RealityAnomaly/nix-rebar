@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # You may also find this setting useful to automatically set the latest compatible kernel:
   #boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
 

@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   security = {
     # replace sudo with doas by default
     sudo.enable = lib.mkDefault false;

@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
+{ config, lib, pkgs, ... }: # scope::eval-config
 let
   inherit (pkgs.stdenv.hostPlatform) isDarwin;
   _inputs = config.rebar.inputs;

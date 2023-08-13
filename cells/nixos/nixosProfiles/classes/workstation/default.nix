@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   imports = [
     root.classes.workstation.nfs-fixes
     root.classes.workstation.pipewire

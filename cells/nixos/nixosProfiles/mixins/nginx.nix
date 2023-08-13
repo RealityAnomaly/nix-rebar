@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   networking.firewall.allowedTCPPorts = [ 443 80 ];
 
   services.nginx = {

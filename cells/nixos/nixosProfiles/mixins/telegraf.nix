@@ -3,7 +3,7 @@
 # Example prometheus alert rules:
 # - https://github.com/Mic92/dotfiles/blob/master/nixos/eva/modules/prometheus/alert-rules.nix
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   isVM = lib.any (mod: mod == "xen-blkfront" || mod == "virtio_console")
     config.boot.initrd.kernelModules;

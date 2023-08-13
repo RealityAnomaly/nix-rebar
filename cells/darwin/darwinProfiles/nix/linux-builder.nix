@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   inherit (inputs) nixpkgs nixos-stable;
   inherit (nixos-stable.lib) nixosSystem;

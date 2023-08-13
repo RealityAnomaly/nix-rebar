@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # Vagrant and other applications that dynamically modify /etc/exports need this
   environment.etc.exports.enable = false;
   networking.firewall.extraCommands = ''

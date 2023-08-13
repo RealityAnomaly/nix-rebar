@@ -1,4 +1,1 @@
-{ root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
-  imports = [ ];
-}
+{ root, inputs, cell, ... }: { config, lib, pkgs, ... }: { imports = [ ]; }

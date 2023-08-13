@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }: {
+{ config, lib, pkgs, modulesPath, ... }: {
   imports =
     [ "${modulesPath}/virtualisation/amazon-image.nix" root.mixins.cloud-init ];
 

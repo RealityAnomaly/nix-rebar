@@ -1,6 +1,6 @@
 # This file collects configuration which disables unnecessary overhead on servers by default
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # Disable documentation
   # Notice this also disables --help for some commands such as nixos-rebuild
   documentation = {

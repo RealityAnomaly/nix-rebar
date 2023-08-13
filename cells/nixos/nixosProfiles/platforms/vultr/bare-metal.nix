@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }: {
+{ config, lib, pkgs, modulesPath, ... }: {
   imports = [
     (modulesPath + "/profiles/all-hardware.nix")
     root.platforms.vultr.default

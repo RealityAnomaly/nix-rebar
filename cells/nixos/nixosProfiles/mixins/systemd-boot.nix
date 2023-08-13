@@ -1,6 +1,6 @@
 # Add this mixin to machines that boot with EFI
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # Only enable during install
   #boot.loader.efi.canTouchEfiVariables = true;
 

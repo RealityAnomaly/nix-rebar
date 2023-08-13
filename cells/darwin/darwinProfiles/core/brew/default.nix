@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
+{ config, lib, pkgs, ... }: # scope::eval-config
 let
   inherit (cell.functions) brewPrefix;
   l = inputs.nixpkgs.lib // builtins;

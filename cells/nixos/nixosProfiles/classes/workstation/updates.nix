@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   # Configures automatic updates
   # system.autoUpgrade = {

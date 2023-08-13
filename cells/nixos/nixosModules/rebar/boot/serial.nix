@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   # Based on https://unix.stackexchange.com/questions/16578/resizable-serial-console-window
   resize = pkgs.writeScriptBin "resize" ''

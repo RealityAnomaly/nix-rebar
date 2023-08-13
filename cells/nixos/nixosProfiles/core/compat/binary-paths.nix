@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
+{ config, lib, pkgs, ... }: # scope::eval-config
 {
   system.activationScripts = {
     # links a few commonly used shells and utilities in scripts,

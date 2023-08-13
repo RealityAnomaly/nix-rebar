@@ -1,4 +1,4 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   imports = [ root.security.ssh.well-known-hosts ];
 }

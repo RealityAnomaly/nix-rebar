@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, modulesPath, ... }: {
+{ config, lib, pkgs, modulesPath, ... }: {
   imports = [ root.platforms.hetzner-online.default ];
 
   boot.kernelModules = [ "kvm-amd" ];

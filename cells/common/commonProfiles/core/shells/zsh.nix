@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   programs.zsh = {
     enable = lib.mkDefault true;
     shellInit = lib.mkDefault "";

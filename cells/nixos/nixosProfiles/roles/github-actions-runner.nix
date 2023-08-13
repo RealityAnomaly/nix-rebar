@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.rebar.roles.github-actions-runner;
   queued-build-hook = builtins.fetchTarball {

@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.rebar;
   parsedSystem = lib.systems.elaborate cfg.host.system;

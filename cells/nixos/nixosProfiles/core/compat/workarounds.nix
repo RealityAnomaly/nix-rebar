@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }: # scope::cell
-{ self, config, lib, pkgs, ... }: # scope::eval-config
+{ config, lib, pkgs, ... }: # scope::eval-config
 {
   # Work around for https://github.com/NixOS/nixpkgs/issues/124215
   documentation.info.enable = false;

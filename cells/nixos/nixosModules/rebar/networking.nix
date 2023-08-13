@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   # enlighten the interface configuration with an extra primary option,
   # which specifies this interface should be where management traffic is routed
   options.networking.interfaces = lib.mkOption {

@@ -1,6 +1,6 @@
 # Useful shared base configuration for NixOS routers
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   inherit (lib) mkForce;
 

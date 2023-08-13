@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   nix.settings = {
     substituters = [ "https://cache.garnix.io" ];
     trusted-substituters = [ "https://cache.garnix.io" ];

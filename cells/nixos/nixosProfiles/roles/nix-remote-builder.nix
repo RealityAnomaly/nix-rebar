@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let cfg = config.rebar.roles.nix-remote-builder;
 in {
   options.rebar.roles.nix-remote-builder = {

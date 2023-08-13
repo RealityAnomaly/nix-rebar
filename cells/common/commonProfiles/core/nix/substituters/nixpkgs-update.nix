@@ -1,5 +1,5 @@
 { root, inputs, cell, ... }:
-{ self, config, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   nix.settings = {
     substituters = [ "https://nixpkgs-update.cachix.org/" ];
     trusted-public-keys = [
