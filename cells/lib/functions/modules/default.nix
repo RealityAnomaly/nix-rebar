@@ -14,18 +14,18 @@ let
         (args.${name} or config._module.args.${name})) (lib.functionArgs f);
     in f (args // extraArgs);
 in rec {
-  /**
-    Load classical Nix modules from a directory using Haumea.
-    Accepts the `args` parameter to pass to Haumea's `load` function.
+  /* *
+     Load classical Nix modules from a directory using Haumea.
+     Accepts the `args` parameter to pass to Haumea's `load` function.
 
-    Example:
-      loadModules' ./modules inputs {
-        transformer = haumea.lib.transformers.liftDefault;
-      }
-      => { core = { nix = { default = { ... }; }; }; }
+     Example:
+       loadModules' ./modules inputs {
+         transformer = haumea.lib.transformers.liftDefault;
+       }
+       => { core = { nix = { default = { ... }; }; }; }
 
-    Type:
-      loadModules' :: Path -> AttrSet -> AttrSet -> AttrSet
+     Type:
+       loadModules' :: Path -> AttrSet -> AttrSet -> AttrSet
   */
   loadModules' = src: _inputs: args:
     let
@@ -43,7 +43,11 @@ in rec {
           cellSuffix = lib.concatStringsSep "/" _inputs.cell.__cr;
           key =
             "${_inputs.inputs.self.outPath}#${cellSuffix}/${stripPath path}";
-          mutator = module: module // { inherit key; };
+          mutator = module:
+            module // {
+              inherit key;
+              _file = path;
+            };
           f = lib.toFunction (import path);
           fn = lib.pipe f [
             lib.functionArgs

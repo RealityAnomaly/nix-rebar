@@ -1,0 +1,100 @@
+From ac5200cb021024d414213024d469a4d289d8de93 Mon Sep 17 00:00:00 2001
+From: Alex Zero <me@alex0.net>
+Date: Sun, 13 Aug 2023 01:31:32 +0100
+Subject: [PATCH] Fix follow path checking at depths greater than 2
+
+We need to recurse into the input tree to handle follows paths that
+trarverse multiple inputs that may or may not be follow paths
+themselves.
+---
+ src/libexpr/flake/lockfile.cc |  2 +-
+ tests/flakes/follow-paths.sh  | 63 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+), 1 deletion(-)
+
+diff --git a/src/libexpr/flake/lockfile.cc b/src/libexpr/flake/lockfile.cc
+index ba2fd46f0..3c202967a 100644
+--- a/src/libexpr/flake/lockfile.cc
++++ b/src/libexpr/flake/lockfile.cc
+@@ -345,7 +345,7 @@ void LockFile::check()
+ 
+     for (auto & [inputPath, input] : inputs) {
+         if (auto follows = std::get_if<1>(&input)) {
+-            if (!follows->empty() && !get(inputs, *follows))
++            if (!follows->empty() && !findInput(*follows))
+                 throw Error("input '%s' follows a non-existent input '%s'",
+                     printInputPath(inputPath),
+                     printInputPath(*follows));
+diff --git a/tests/flakes/follow-paths.sh b/tests/flakes/follow-paths.sh
+index fe9b51c65..a70d9acb2 100644
+--- a/tests/flakes/follow-paths.sh
++++ b/tests/flakes/follow-paths.sh
+@@ -148,3 +148,66 @@ git -C $flakeFollowsA add flake.nix
+ 
+ nix flake lock $flakeFollowsA 2>&1 | grep "warning: input 'B' has an override for a non-existent input 'invalid'"
+ nix flake lock $flakeFollowsA 2>&1 | grep "warning: input 'B' has an override for a non-existent input 'invalid2'"
++
++# Now test follow path overloading
++flakeFollowsOverloadA=$TEST_ROOT/follows/overload/flakeA
++flakeFollowsOverloadB=$TEST_ROOT/follows/overload/flakeA/flakeB
++flakeFollowsOverloadC=$TEST_ROOT/follows/overload/flakeA/flakeB/flakeC
++flakeFollowsOverloadD=$TEST_ROOT/follows/overload/flakeA/flakeB/flakeC/flakeD
++
++# Test following path flakerefs.
++createGitRepo $flakeFollowsOverloadA
++mkdir -p $flakeFollowsOverloadB
++mkdir -p $flakeFollowsOverloadC
++mkdir -p $flakeFollowsOverloadD
++
++cat > $flakeFollowsOverloadD/flake.nix <<EOF
++{
++    description = "Flake D";
++    inputs = {};
++    outputs = { ... }: {};
++}
++EOF
++
++cat > $flakeFollowsOverloadC/flake.nix <<EOF
++{
++    description = "Flake C";
++    inputs.D.url = "path:./flakeD";
++    outputs = { ... }: {};
++}
++EOF
++
++cat > $flakeFollowsOverloadB/flake.nix <<EOF
++{
++    description = "Flake B";
++    inputs = {
++        C = {
++            url = "path:./flakeC";
++        };
++        D.follows = "C/D";
++    };
++    outputs = { ... }: {};
++}
++EOF
++
++# input B/D should be able to be found...
++cat > $flakeFollowsOverloadA/flake.nix <<EOF
++{
++    description = "Flake A";
++    inputs = {
++        B = {
++            url = "path:./flakeB";
++            inputs.C.follows = "C";
++        };
++        C.url = "path:./flakeB/flakeC";
++    };
++    outputs = { ... }: {};
++}
++EOF
++
++git -C $flakeFollowsOverloadA add flake.nix flakeB/flake.nix \
++  flakeB/flakeC/flake.nix flakeB/flakeC/flakeD/flake.nix
++
++nix flake metadata $flakeFollowsOverloadA
++nix flake update $flakeFollowsOverloadA
++nix flake lock $flakeFollowsOverloadA
+-- 
+2.41.0
+

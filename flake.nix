@@ -122,7 +122,7 @@
           #(pkgs "overrides")
           #(files "files")
           (functions "functions")
-          #(functions "overlays")
+          (functions "overlays")
 
           # Modules
           (functions "commonModules")
@@ -148,23 +148,24 @@
       # winnow :: system.cell.block.target -> system.target (filtered version of harvest)
 
       #packages = std.harvest inputs.self [ "common" "packages" ];
-      checks = std.harvest self [
+      checks = hive.harvest self [
         [ "_repository" "snapshots" "default" "check" ] # namaka snapshot tests
         [ "nixos" "checks" ]
       ];
       devShells = hive.harvest self [ "_repository" "devshells" ];
-      functions = std.pick self [ "lib" "functions" ];
+      functions = hive.pick self [ "lib" "functions" ];
+      overlays = hive.collect self "overlays";
 
-      commonModules = std.pick self [ "common" "commonModules" ];
-      nixosModules = std.pick self [ "nixos" "nixosModules" ];
-      darwinModules = std.pick self [ "darwin" "darwinModules" ];
-      #homeModules = std.pick self [ "home" "homeModules" ];
+      commonModules = hive.pick self [ "common" "commonModules" ];
+      nixosModules = hive.pick self [ "nixos" "nixosModules" ];
+      darwinModules = hive.pick self [ "darwin" "darwinModules" ];
+      #homeModules = hive.pick self [ "home" "homeModules" ];
 
-      commonProfiles = std.harvest self [ "common" "commonProfiles" ];
-      nixosProfiles = std.harvest self [ "nixos" "nixosProfiles" ];
-      darwinProfiles = std.harvest self [ "darwin" "darwinProfiles" ];
-      #homeProfiles = std.harvest self [ "home" "homeProfiles" ];
-      devshellProfiles = std.harvest self [ "common" "devshellProfiles" ];
+      commonProfiles = hive.harvest self [ "common" "commonProfiles" ];
+      nixosProfiles = hive.harvest self [ "nixos" "nixosProfiles" ];
+      darwinProfiles = hive.harvest self [ "darwin" "darwinProfiles" ];
+      #homeProfiles = hive.harvest self [ "home" "homeProfiles" ];
+      devshellProfiles = hive.harvest self [ "common" "devshellProfiles" ];
 
       nixosConfigurations = hive.collect self "nixosConfigurations";
       diskoConfigurations = hive.collect self "diskoConfigurations";

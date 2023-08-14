@@ -11,4 +11,6 @@
     root.core.shells.default
     root.core.environment
   ];
+
+  rebar.host.overlays = builtins.attrValues cell.overlays;
 }
