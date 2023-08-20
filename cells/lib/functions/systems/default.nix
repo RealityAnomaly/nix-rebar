@@ -18,7 +18,7 @@
         predicate = system: system.isDarwin;
       }
     ];
-  in root.utilities.genAttrs' types (value: {
+  in root.genAttrs' types (value: {
     inherit value;
     inherit (value) name;
   });

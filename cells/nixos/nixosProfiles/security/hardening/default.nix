@@ -22,13 +22,6 @@ in {
     logRefusedConnections = lib.mkDefault false;
   };
 
-  # part of dangerous hardening
-  # nice to have but breaks some applications, like spotify
-  # environment = {
-  #   memoryAllocator.provider = "scudo";
-  #   variables.SCUDO_OPTIONS = "ZeroContents=1";
-  # };
-
   boot = {
     blacklistedKernelModules = [
       # Obscure network protocols
@@ -97,20 +90,6 @@ in {
       "net.ipv4.conf.all.send_redirects" = false;
       "net.ipv4.conf.default.send_redirects" = false;
     };
-
-    # Part of dangerous hardening. Some applications can completely crash the system
-    #kernelPackages = pkgs.linuxPackages_hardened;
-
-    kernelParams = [
-      # Slab/slub sanity checks, redzoning, and poisoning
-      #"slub_debug=FZP"
-
-      # Overwrite free'd memory
-      #"page_poison=1"
-
-      # Enable page allocator randomization
-      #"page_alloc.shuffle=1"
-    ];
   };
 
   security = {
@@ -123,14 +102,7 @@ in {
     # enable auditing
     auditd.enable = true;
 
-    # causes a serious performance hit
-    # allowSimultaneousMultithreading = false;
-
     forcePageTableIsolation = true;
-
-    # we want to be able to load modules on demand
-    # lockKernelModules = true;
-
     protectKernelImage = true;
     unprivilegedUsernsClone = true;
 

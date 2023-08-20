@@ -5,7 +5,4 @@
     allowed-users = [ "@wheel" ];
     trusted-users = [ "root" "@wheel" ];
   };
-
-  # don't need ntfs for production
-  boot.blacklistedKernelModules = [ "ntfs" ];
 }

@@ -1,6 +1,6 @@
-{ root, inputs, cell, }: {
+{ root, }: {
   inherit (root.utilities.attrs)
-    mapFilterAttrs genAttrs' attrCount defaultAttrs defaultSetAttrs enumAttrs
+    mapFilterAttrs genAttrs' countAttrs defaultAttrs defaultSetAttrs enumAttrs
     extractPair imapAttrsToList recursiveMerge recursiveMergeAttrsWith
     recursiveMergeAttrsWithNames;
   inherit (root.utilities.lists) filterListNonEmpty;

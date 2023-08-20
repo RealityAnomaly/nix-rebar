@@ -1,0 +1,2 @@
+#json
+{"foobar":{"cellBlock1":{"__cr":["foo2","bar1","foobar","cellBlock1.nix"],"inputs":{},"user":"foobar"},"cellBlock2":{"__cr":["foo2","bar1","foobar","cellBlock2.nix"],"inputs":{},"user":"foobar"}}}

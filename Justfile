@@ -50,7 +50,7 @@ lint *FILES=prj-root: (deadnix "check" FILES) (statix "check" FILES)
 
 # <- Lint and format files
 fmt *FILES=prj-root:
-  treefmt --no-cache {{FILES}}
+  treefmt --no-cache
 
 # <- Write automatic linter fixes to files
 fix *FILES=prj-root: (deadnix "fix" FILES) (statix "fix" FILES)

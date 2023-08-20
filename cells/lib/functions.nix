@@ -3,5 +3,8 @@ let inherit (inputs) haumea;
 in haumea.lib.load {
   src = ./functions;
   transformer = haumea.lib.transformers.liftDefault;
-  inputs = { inherit cell inputs; };
+  inputs = {
+    inherit cell inputs;
+    inherit (inputs.nixpkgs) lib;
+  };
 }

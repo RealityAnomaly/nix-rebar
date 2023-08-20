@@ -1,0 +1,2 @@
+#json
+{"home-manager":{"sharedModules":[]},"imports":[{"networking":{"computerName":"foobar"}}],"rebar":{"enable":true,"host":{"system":"aarch64-darwin","types":[]},"inputs":{}},"system":{"stateVersion":4}}
