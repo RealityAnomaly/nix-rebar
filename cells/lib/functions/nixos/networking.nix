@@ -1,7 +1,7 @@
 { root, inputs, cell, }:
 let
   inherit (inputs.nixpkgs) lib;
-  inherit (inputs.cells.lib.functions.utilities) extractPair;
+  inherit (inputs.cells.lib.functions) extractPair;
 in rec {
   # Returns the manamgement interface for the specified machine
   primaryInterface = config:

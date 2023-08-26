@@ -7,8 +7,7 @@ let
   inherit (inputs.nixpkgs.lib)
     filterAttrs flip hasPrefix id pipe removePrefix splitString warn;
   inherit (inputs) haumea namaka;
-  inherit (root.utilities.attrs) flattenAttrs;
-  inherit (root.utilities.misc) stripPaths;
+  inherit (root) flattenAttrs stripPaths;
 
 in args:
 

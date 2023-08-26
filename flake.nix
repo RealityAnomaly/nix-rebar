@@ -59,6 +59,7 @@
       };
     };
     nixago.url = "github:nix-community/nixago";
+    nixt.url = "github:nix-community/nixt";
     n2c = {
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -114,7 +115,8 @@
         with hive.blockTypes; [
           # Library functions
           (functions "checks")
-          #(data "data")
+          (data "data")
+          (data "tests")
           (devshells "devshells" { ci.build = true; })
           #(installables "packages")
           (namaka "snapshots" { ci.check = true; })
@@ -152,6 +154,7 @@
         [ "_repository" "snapshots" "default" "check" ] # namaka snapshot tests
         [ "nixos" "checks" ]
       ];
+      data = hive.pick self [ "lib" "data" ];
       devShells = hive.harvest self [ "_repository" "devshells" ];
       functions = hive.pick self [ "lib" "functions" ];
       overlays = hive.collect self "overlays";
@@ -169,5 +172,7 @@
 
       nixosConfigurations = hive.collect self "nixosConfigurations";
       diskoConfigurations = hive.collect self "diskoConfigurations";
+
+      __nixt = hive.pick self [ "_repository" "tests" ];
     };
 }

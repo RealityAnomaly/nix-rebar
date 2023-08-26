@@ -1,8 +1,10 @@
-{ root, }: {
-  inherit (root.utilities.attrs)
-    mapFilterAttrs genAttrs' countAttrs defaultAttrs defaultSetAttrs enumAttrs
-    extractPair imapAttrsToList recursiveMerge recursiveMergeAttrsWith
-    recursiveMergeAttrsWithNames;
-  inherit (root.utilities.lists) filterListNonEmpty;
-  inherit (root.utilities.misc) optionalPath optionalPathImport isIPv6 tryEval';
+{ lib, root, }:
+{
+  # inherit (root.utils.attrs)
+  #   mapFilterAttrs genAttrs' countAttrs defaultAttrs defaultSetAttrs enumAttrs
+  #   extractPair flattenAttrs imapAttrsToList recursiveMerge recursiveMergeAttrsWith
+  #   recursiveMergeAttrsWithNames;
+  # inherit (root.utils.lists) filterListNonEmpty;
+  # inherit (root.utils.misc) isIPv6 tryEval';
+  # inherit (root.utils.paths) optionalPath optionalPathImport stripPaths;
 }

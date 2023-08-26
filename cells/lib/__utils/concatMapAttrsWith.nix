@@ -1,4 +1,4 @@
-{ root, inputs, cell, }:
+{ lib }:
 
 # map each attribute in the given set into
 # a list of attributes and subsequently merge them into
@@ -17,6 +17,6 @@
 
 let
   inherit (builtins) attrValues foldl' mapAttrs;
-  inherit (inputs.nixpkgs.lib) flip pipe;
+  inherit (lib) flip pipe;
 
 in merge: f: flip pipe [ (mapAttrs f) attrValues (foldl' merge { }) ]

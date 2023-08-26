@@ -1,5 +1,5 @@
 { root, inputs, cell, }:
-let inherit (root.utilities.systemd) hardeningProfiles;
+let inherit (root.nixos.systemd) hardeningProfiles;
 in hardeningProfiles.isolate // {
   IPAddressDeny = [ "" ];
   PrivateNetwork = false;
