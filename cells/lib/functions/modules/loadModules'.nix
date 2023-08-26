@@ -52,6 +52,6 @@ let
       mutator fn;
 in haumea.lib.load ({
   inherit src;
-  loader = pathLoader;
-  inputs = _inputs // { inherit lib; };
+  loader = [ (root.haumea.matchers.nixNoTests pathLoader) ];
+  inputs = { inherit lib; } // _inputs;
 } // args)

@@ -5,13 +5,12 @@ let
   inherit (nixpkgs.stdenv) isLinux;
 
   l = inputs.nixpkgs.lib // builtins;
-  cats = pkgCategories [ "formatting" "ops" "utils" ];
+  cats = pkgCategories [ "formatting" "ops" "utils" "tests" ];
 
   commonCommands = [
     (cats.formatting nixpkgs.deadnix { })
     (cats.formatting nixpkgs.nixfmt { })
     (cats.formatting nixpkgs.nodePackages.prettier { })
-    (cats.utils nixpkgs.shellcheck { })
     (cats.formatting nixpkgs.statix { })
 
     (cats.ops nixpkgs.colmena { })
@@ -24,6 +23,9 @@ let
     (cats.utils nixpkgs.nix-eval-jobs { })
     (cats.utils nixpkgs.nix-tree { })
     (cats.utils nixpkgs.nvd { })
+    (cats.utils nixpkgs.shellcheck { })
+
+    (cats.tests inputs.nixt.packages.default { })
   ];
 
   linuxCommands = l.optionals isLinux [
