@@ -73,6 +73,11 @@ deadnix action +FILES=prj-root:
     --no-lambda-pattern-names \
     {{FILES}}
 
+# section:tests
+test:
+  nixt -v
+  namaka check
+
 # section::licensing
 
 # <- Validate the project's licensing and copyright info

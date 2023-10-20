@@ -23,7 +23,7 @@
 
     f = value:
       if builtins.isAttrs value then
-        lib.mapAttrs (_: v: f v) value
+        lib.mapAttrs (_: f) value
       else if builtins.isList value then
         map f value
       else if ((builtins.isPath value) || (builtins.isString value))

@@ -13,3 +13,4 @@
 /.local
 /.nix-overrides
 result
+.DS_Store

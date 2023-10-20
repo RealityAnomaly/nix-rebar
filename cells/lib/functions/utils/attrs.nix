@@ -1,7 +1,9 @@
-{ root, inputs, cell, lib, }: rec {
+{ root, inputs, cell, lib, }: let
+  inherit (inputs) yants;
+in rec {
   __export = {
-    inherit concatMapAttrsWith countAttrs defaultAttrs defaultSetAttrs enumAttrs
-      extractPair extractFilterAttrs flattenAttrs genAttrs' imapAttrsToList
+    inherit concatMapAttrsWith countAttrs defaultAttrs enumAttrs
+      extractPair extractFilterAttrs mapFlattenAttrs flattenAttrs genAttrs' imapAttrsToList
       mapFilterAttrs recursiveMerge recursiveMergeAttrsWith
       recursiveMergeAttrsWithNames;
   };
@@ -22,12 +24,14 @@
          { x = "a"; y = "b"; }
        => { x = "a"; y = "b"; mykey = [ "aa" "bb"]; }
   */
-  concatMapAttrsWith = merge: f:
-    lib.flip lib.pipe [
-      (lib.mapAttrs f)
-      builtins.attrValues
-      (builtins.foldl' merge { })
-    ];
+  concatMapAttrsWith =
+    yants.defun (with yants; [function function (attrs any) (attrs any)]) (
+      merge: f: lib.flip lib.pipe [
+        (lib.mapAttrs f)
+        builtins.attrValues
+        (builtins.foldl' merge { })
+      ]
+    );
 
   /* *
      Count the number of attributes in a set
@@ -37,16 +41,10 @@
   /* *
      TODO: documentation
   */
-  defaultAttrs = attrs: default: f: if attrs != null then f attrs else default;
-
-  /* *
-     Given a list of attribute sets, merges the keys specified by "names" from "defaults" into them if they do not exist
-  */
-  defaultSetAttrs = sets: names: defaults:
-    (lib.mapAttrs' (n: v:
-      lib.nameValuePair n (v // lib.genAttrs names (name:
-        (if builtins.hasAttr name v then v.${name} else defaults.${name}))))
-      sets);
+  defaultAttrs =
+    yants.defun (with yants; [(either (attrs any) any) (attrs any) function (attrs any)]) (
+      attrs: default: f: if attrs != null then f attrs else default
+    );
 
   /* *
      Convert a list of strings to an attrset where the keys match the values.
@@ -61,8 +59,9 @@
   */
   extractPair = predicate: attrs:
     let
-      filtered = lib.filterAttrs predicate attrs;
-      name = lib.head (builtins.attrNames filtered);
+      found = builtins.attrNames (lib.filterAttrs predicate attrs);
+    in if ((builtins.length found) == 0) then null else let
+      name = lib.head found;
     in {
       inherit name;
       value = attrs.${name};
@@ -72,20 +71,26 @@
      Extract attributes from a list of attribute sets while excluding the specified attributes
   */
   extractFilterAttrs = exclude: attrs:
-    lib.zipAttrs (map (lib.filterAttrs (n: _: !builtins.elem n exclude)) attrs);
-
-  /* *
-     Flattens an attribute set by concatenating the paths of all its leaves
-  */
-  flattenAttrs = sep: attrs:
+    lib.zipAttrs (map (lib.filterAttrs (n: _: !(builtins.elem n exclude))) attrs);
+  
+  mapFlattenAttrs = fn: attrs:
     let
       f = cursor: value:
         if builtins.isAttrs value then
           lib.flatten (lib.mapAttrsToList (k: f (cursor ++ [ k ])) value)
-        else {
-          "${lib.concatStringsSep sep cursor}" = value;
+        else let
+          pair = fn cursor value;
+        in {
+          ${pair.name} = pair.value;
         };
     in recursiveMerge (f [ ] attrs);
+
+  /* *
+     Flattens an attribute set by concatenating the paths of all its leaves
+  */
+  flattenAttrs = sep: mapFlattenAttrs (
+    cursor: lib.nameValuePair (lib.concatStringsSep sep cursor)
+  );
 
   /* *
      Generate an attribute set by mapping a function over a list of values.
@@ -114,7 +119,7 @@
   */
   recursiveMerge = attrList:
     let
-      f = lib.zipAttrsWith (n: values:
+      f = builtins.zipAttrsWith (n: values:
         if lib.tail values == [ ] then
           lib.head values
         else if lib.all builtins.isList values then

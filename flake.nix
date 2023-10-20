@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Alex XZ Cypher Zero <legal@alex0.net>
+#
+# SPDX-License-Identifier: ARR
+
 {
   description = "nix-rebar";
 
@@ -36,7 +40,6 @@
         home-manager.follows = "home";
         nixos-generators.follows = "nixos-generators";
         nixpkgs.follows = "nixpkgs";
-        paisano.follows = "paisano";
       };
     };
     home = {
@@ -64,10 +67,6 @@
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    paisano = {
-      url = "github:VertexA115/paisano-nix-core/feat/cell-introspection";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     std = {
       url = "github:divnix/std";
       inputs = {
@@ -83,6 +82,13 @@
     terranix = {
       url = "github:terranix/terranix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    yants.url = "github:divnix/yants";
+
+    # thirdparty
+    tvl = {
+      url = "git+https://cl.tvl.fyi/depot.git";
+      flake = false;
     };
 
     # intrinsic::packages
@@ -101,8 +107,7 @@
     nixos-generators.url = "github:nix-community/nixos-generators";
   };
 
-  outputs = { self, std, nixpkgs, hive, ... }@inputs:
-    hive.growOn {
+  outputs = { self, std, nixpkgs, hive, ... }@inputs: hive.growOn {
       inherit inputs;
 
       nixpkgsConfig = { allowUnfree = true; };
@@ -116,15 +121,19 @@
           # Library functions
           (functions "checks")
           (data "data")
-          (data "tests")
+          (anything "tests")
           (devshells "devshells" { ci.build = true; })
           #(installables "packages")
           (namaka "snapshots" { ci.check = true; })
           (nixago "config")
           #(pkgs "overrides")
           #(files "files")
-          (functions "functions")
           (functions "overlays")
+
+          # functions that use our import signature
+          (functions "functions") 
+          # external functions using a shim
+          (functions "vendor")
 
           # Modules
           (functions "commonModules")
@@ -143,7 +152,9 @@
           nixosConfigurations
           diskoConfigurations
         ];
-    } {
+    } (let
+      tests = hive.pick self [ "lib" "tests" ];
+    in rec {
       # collect :: collects everything, no cell block ref is necessary
       # harvest :: system.cell.block.target -> system.target
       # pick :: system.cell.block.target -> target (no system is necessary)
@@ -154,10 +165,13 @@
         [ "_repository" "snapshots" "default" "check" ] # namaka snapshot tests
         [ "nixos" "checks" ]
       ];
+
       data = hive.pick self [ "lib" "data" ];
       devShells = hive.harvest self [ "_repository" "devshells" ];
       functions = hive.pick self [ "lib" "functions" ];
       overlays = hive.collect self "overlays";
+
+      vendor = hive.pick self [ "lib" "vendor" ];
 
       commonModules = hive.pick self [ "common" "commonModules" ];
       nixosModules = hive.pick self [ "nixos" "nixosModules" ];
@@ -173,6 +187,7 @@
       nixosConfigurations = hive.collect self "nixosConfigurations";
       diskoConfigurations = hive.collect self "diskoConfigurations";
 
-      __nixt = hive.pick self [ "_repository" "tests" ];
-    };
+      __nixt = functions.tests.loadNixt tests;
+      __nixTests = functions.tests.loadNixpkgs tests;
+    });
 }

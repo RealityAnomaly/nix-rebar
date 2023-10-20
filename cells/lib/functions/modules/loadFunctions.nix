@@ -1,13 +1,14 @@
 { inputs, cell, lib, }:
 let
   inherit (inputs) haumea;
-  hoistExportedAttrs = import ./__utils/hoistExportedAttrs.nix { inherit lib; };
+  hoistExportedAttrs = import ./_utils/hoistExportedAttrs.nix { inherit lib; };
   nixNoTests = import ./../haumea/matchers/nixNoTests.nix { inherit lib; };
+  liftDefaultSafe = import ./../haumea/transformers/liftDefaultSafe.nix { inherit lib; };
 in src: _inputs:
 haumea.lib.load {
   inherit src;
   transformer =
-    [ (hoistExportedAttrs "__export") haumea.lib.transformers.liftDefault ];
+    [ (hoistExportedAttrs "__export") liftDefaultSafe ];
   loader = [ (nixNoTests haumea.lib.loaders.default) ];
-  inputs = { inherit lib; } // _inputs;
+  inputs = _inputs;
 }

@@ -2,35 +2,30 @@
 
 let
   inherit (builtins)
-    attrNames concatStringsSep filter mapAttrs pathExists readFile storeDir tail
+    attrNames concatStringsSep filter pathExists readFile storeDir tail
     toJSON trace tryEval;
   inherit (inputs.nixpkgs.lib)
-    filterAttrs flip hasPrefix id pipe removePrefix splitString warn;
-  inherit (inputs) haumea namaka;
-  inherit (root) flattenAttrs stripPaths;
+    filterAttrs flip hasPrefix id pipe removePrefix splitString attrValues foldl' mapAttrs mapAttrs' nameValuePair;
+  inherit (inputs) namaka;
+  inherit (root) stripPaths;
 
 in args:
 
 let
-  src = toString (args.src or (warn
-    "namaka.load: `flake` and `dir` have been deprecated, use `src` directly instead"
-    (args.flake + "/${args.dir or "tests"}")));
+  inherit (args) state;
+  merged = foldl' (a: b: a // b) { } (attrValues (
+    mapAttrs (prefix: mapAttrs' (n: nameValuePair "${prefix}__${n}")) args.tests
+  ));
 
-  tests = haumea.lib.load (removeAttrs args [ "flake" "dir" ] // {
-    inherit src;
-    loader = haumea.lib.loaders.path;
-  });
-
-  results = flip mapAttrs (flattenAttrs "__" tests) (name: path:
+  results = flip mapAttrs merged (name: test:
     assert hasPrefix "." name
       -> throw "invalid snapshot '${name}', names should not start with '.'";
 
     let
-      test = import path args.inputs;
       inherit (test) expr;
       format = test.format or "json";
 
-      snapPath = "${src}/_snapshots/${name}";
+      snapPath = "${state}/_snapshots/${name}";
       old = pathExists snapPath;
       snap = readFile snapPath;
       prefix = ''
@@ -50,7 +45,7 @@ let
     });
 
   msg = {
-    dir = pipe src [
+    dir = pipe state [
       (removePrefix storeDir)
       (splitString "/")
       (filter (x: x != ""))

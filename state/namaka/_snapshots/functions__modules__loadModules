@@ -1,0 +1,2 @@
+#json
+{"test1":{"_file":"/nix/store/iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii/lib/functions/modules/_spec/modules/test1.nix","key":"unknown#test1","test":"foo123"},"test2":{"_file":"/nix/store/iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii/lib/functions/modules/_spec/modules/test2.nix","key":"unknown#test2","test2":"foobar123"},"test3":{"default":{"_file":"/nix/store/iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii/lib/functions/modules/_spec/modules/test3/default.nix","key":"unknown#test3/default"}}}

@@ -5,7 +5,7 @@ let
 in rec {
   # Returns the manamgement interface for the specified machine
   primaryInterface = config:
-    extractPair (_n: v: v.primary == true) config.networking.interfaces;
+    extractPair (_n: v: v.primary) config.networking.interfaces;
 
   # Returns the management IPv4 address for the specified machine
   primaryIPv4 = config:
