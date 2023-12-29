@@ -1,6 +1,8 @@
-{ inputs, cell, ... }: let
-  inherit (inputs.cells.lib.functions.modules) extractSuites loadConfigurations
-    loadModules loadModules' loadUserSubcell mkConfiguration;
+{ inputs, cell, ... }:
+let
+  inherit (inputs.cells.lib.functions.modules)
+    extractSuites loadConfigurations loadModules loadModules' loadUserSubcell
+    mkConfiguration;
 in {
   snapshot = {
     extractSuites.expr = extractSuites {

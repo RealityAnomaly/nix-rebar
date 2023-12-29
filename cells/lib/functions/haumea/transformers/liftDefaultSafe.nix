@@ -1,13 +1,12 @@
 { lib, }:
 
-let
-  inherit (lib.attrsets)
-    isAttrs unionOfDisjoint
-    ;
-in
+let inherit (lib.attrsets) isAttrs unionOfDisjoint;
 
-_: mod: let
+in _: mod:
+let
   default = mod.default or { };
-# allow default to override the module if it's a simple value
-in if ! isAttrs default then default else
+  # allow default to override the module if it's a simple value
+in if !isAttrs default then
+  default
+else
   unionOfDisjoint (removeAttrs mod [ "default" ]) default

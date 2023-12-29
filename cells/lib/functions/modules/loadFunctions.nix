@@ -3,12 +3,12 @@ let
   inherit (inputs) haumea;
   hoistExportedAttrs = import ./_utils/hoistExportedAttrs.nix { inherit lib; };
   nixNoTests = import ./../haumea/matchers/nixNoTests.nix { inherit lib; };
-  liftDefaultSafe = import ./../haumea/transformers/liftDefaultSafe.nix { inherit lib; };
+  liftDefaultSafe =
+    import ./../haumea/transformers/liftDefaultSafe.nix { inherit lib; };
 in src: _inputs:
 haumea.lib.load {
   inherit src;
-  transformer =
-    [ (hoistExportedAttrs "__export") liftDefaultSafe ];
+  transformer = [ (hoistExportedAttrs "__export") liftDefaultSafe ];
   loader = [ (nixNoTests haumea.lib.loaders.default) ];
   inputs = _inputs;
 }

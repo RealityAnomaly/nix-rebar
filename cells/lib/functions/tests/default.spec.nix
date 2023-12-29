@@ -1,1 +1,1 @@
-{ inputs, cell, lib, ... }: {}
+{ inputs, cell, lib, ... }: { }

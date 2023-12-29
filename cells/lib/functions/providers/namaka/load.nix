@@ -2,10 +2,11 @@
 
 let
   inherit (builtins)
-    attrNames concatStringsSep filter pathExists readFile storeDir tail
-    toJSON trace tryEval;
+    attrNames concatStringsSep filter pathExists readFile storeDir tail toJSON
+    trace tryEval;
   inherit (inputs.nixpkgs.lib)
-    filterAttrs flip hasPrefix id pipe removePrefix splitString attrValues foldl' mapAttrs mapAttrs' nameValuePair;
+    filterAttrs flip hasPrefix id pipe removePrefix splitString attrValues
+    foldl' mapAttrs mapAttrs' nameValuePair;
   inherit (inputs) namaka;
   inherit (root) stripPaths;
 
@@ -13,9 +14,9 @@ in args:
 
 let
   inherit (args) state;
-  merged = foldl' (a: b: a // b) { } (attrValues (
-    mapAttrs (prefix: mapAttrs' (n: nameValuePair "${prefix}__${n}")) args.tests
-  ));
+  merged = foldl' (a: b: a // b) { } (attrValues
+    (mapAttrs (prefix: mapAttrs' (n: nameValuePair "${prefix}__${n}"))
+      args.tests));
 
   results = flip mapAttrs merged (name: test:
     assert hasPrefix "." name

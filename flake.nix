@@ -107,7 +107,8 @@
     nixos-generators.url = "github:nix-community/nixos-generators";
   };
 
-  outputs = { self, std, nixpkgs, hive, ... }@inputs: hive.growOn {
+  outputs = { self, std, nixpkgs, hive, ... }@inputs:
+    hive.growOn {
       inherit inputs;
 
       nixpkgsConfig = { allowUnfree = true; };
@@ -131,7 +132,7 @@
           (functions "overlays")
 
           # functions that use our import signature
-          (functions "functions") 
+          (functions "functions")
           # external functions using a shim
           (functions "vendor")
 
@@ -152,8 +153,7 @@
           nixosConfigurations
           diskoConfigurations
         ];
-    } (let
-      tests = hive.pick self [ "lib" "tests" ];
+    } (let tests = hive.pick self [ "lib" "tests" ];
     in rec {
       # collect :: collects everything, no cell block ref is necessary
       # harvest :: system.cell.block.target -> system.target

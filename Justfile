@@ -49,7 +49,7 @@ toml2nix file:
 lint *FILES=prj-root: (deadnix "check" FILES) (statix "check" FILES)
 
 # <- Lint and format files
-fmt *FILES=prj-root:
+fmt *FILES=prj-root: (lint FILES)
   treefmt --no-cache
 
 # <- Write automatic linter fixes to files
