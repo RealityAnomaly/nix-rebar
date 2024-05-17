@@ -14,7 +14,7 @@
   pre-commit = {
     commands = {
       lint-then-fmt = {
-        run = "just fmt {staged_files}";
+        run = "treefmt --no-cache";
         skip = [ "merge" "rebase" ];
       };
     };

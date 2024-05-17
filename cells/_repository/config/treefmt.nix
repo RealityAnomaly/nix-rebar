@@ -17,7 +17,7 @@
     };
     prettier = {
       command = "prettier";
-      options = [ "--plugin" "prettier-plugin-toml" "--write" ];
+      options = [ "--write" ];
       includes = [
         "*.css"
         "*.html"

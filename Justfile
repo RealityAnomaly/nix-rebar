@@ -67,11 +67,16 @@ statix action +FILES=prj-root:
 # <- Run `deadnix` with sane options
 [private]
 deadnix action +FILES=prj-root:
-  @deadnix \
+  echo {{FILES}}
+  deadnix \
     {{ if action == "fix" { "--edit" } else { "--fail" } }} \
     --no-underscore \
     --no-lambda-pattern-names \
     {{FILES}}
+
+# section:flake
+update:
+  nix flake lock --update-input nixos-stable --update-input nixos-unstable --update-input home
 
 # section:tests
 test:

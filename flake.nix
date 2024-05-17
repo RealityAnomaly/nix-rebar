@@ -10,7 +10,7 @@
     nixpkgs.follows = "nixos-stable";
     nixpkgs-stable.follows = "nixos-stable";
     nixpkgs-unstable.follows = "nixos-unstable";
-    nixos-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixos-stable.url = "github:NixOS/nixpkgs/nixos-23.11";
     nixos-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # intrinsic::libraries
@@ -43,7 +43,7 @@
       };
     };
     home = {
-      url = "github:nix-community/home-manager/release-23.05";
+      url = "github:nix-community/home-manager/release-23.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     makes = {
@@ -181,7 +181,7 @@
       commonProfiles = hive.harvest self [ "common" "commonProfiles" ];
       nixosProfiles = hive.harvest self [ "nixos" "nixosProfiles" ];
       darwinProfiles = hive.harvest self [ "darwin" "darwinProfiles" ];
-      #homeProfiles = hive.harvest self [ "home" "homeProfiles" ];
+      homeProfiles = hive.harvest self [ "home" "homeProfiles" ];
       devshellProfiles = hive.harvest self [ "common" "devshellProfiles" ];
 
       nixosConfigurations = hive.collect self "nixosConfigurations";

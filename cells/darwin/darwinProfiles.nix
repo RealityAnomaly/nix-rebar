@@ -1,4 +1,4 @@
 # boilerplate::loader::module_generic
 _inputs@{ cell, inputs, }:
-let inherit (inputs.cells.lib.functions.modules) loadModules;
+let inherit (inputs.cells.lib.functions) loadModules;
 in loadModules ./darwinProfiles _inputs

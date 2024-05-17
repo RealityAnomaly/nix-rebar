@@ -70,4 +70,12 @@ in {
         babj = "127127";
       };
   };
+
+  # example of a unit test
+  # unit.imapAttrsToList = {
+  #   fooCase = {
+  #     expr = true;
+  #     expected = true;
+  #   };
+  # };
 }

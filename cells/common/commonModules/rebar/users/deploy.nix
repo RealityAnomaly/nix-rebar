@@ -5,7 +5,7 @@ let
   inherit (cells.lib) functions;
   inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
 
-  inherit (functions.modules) extractSuites;
+  inherit (functions) extractSuites;
 
   cfg = config.rebar;
   isNixos = isLinux && !isDarwin;
