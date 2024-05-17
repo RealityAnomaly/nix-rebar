@@ -76,7 +76,7 @@ deadnix action +FILES=prj-root:
 
 # section:flake
 update:
-  nix flake lock --update-input nixos-stable --update-input nixos-unstable --update-input home
+  nix flake lock --update-input nixos-stable --update-input nixos-unstable --update-input home --update-input darwin
 
 # section:tests
 test:
